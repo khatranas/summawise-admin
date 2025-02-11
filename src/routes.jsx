@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
 import { SignIn, SignUp } from "@/pages/auth";
+import Accounts from "./pages/dashboard/account";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -29,7 +30,7 @@ export const routes = [
         icon: <UserGroupIcon {...icon} />,
         name: "Quản lý tài khoản",
         path: "/quan-ly-tai-khoan",
-        element: <Profile />,
+        element: <Accounts />,
       },
       {
         icon: <UserIcon {...icon} />,
