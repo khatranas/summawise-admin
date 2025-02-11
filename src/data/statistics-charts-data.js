@@ -107,25 +107,26 @@ const completedTasksChart = {
 export const statisticsChartsData = [
   {
     color: "white",
-    title: "Website View",
-    description: "Last Campaign Performance",
-    footer: "campaign sent 2 days ago",
+    title: "Lượt truy cập website",
+    description: "Hiệu suất chiến dịch gần đây",
+    footer: "Chiến dịch được gửi cách đây 2 ngày",
     chart: websiteViewsChart,
   },
   {
     color: "white",
-    title: "Daily Sales",
-    description: "15% increase in today sales",
-    footer: "updated 4 min ago",
+    title: "Doanh số hàng ngày",
+    description: "Tăng 15% doanh số hôm nay",
+    footer: "Cập nhật 4 phút trước",
     chart: dailySalesChart,
   },
   {
     color: "white",
-    title: "Completed Tasks",
-    description: "Last Campaign Performance",
-    footer: "just updated",
+    title: "Nhiệm vụ đã hoàn thành",
+    description: "Hiệu suất chiến dịch gần đây",
+    footer: "Vừa mới cập nhật",
     chart: completedTasksChart,
   },
 ];
+
 
 export default statisticsChartsData;
