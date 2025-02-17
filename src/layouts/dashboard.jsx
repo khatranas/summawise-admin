@@ -24,7 +24,7 @@ export function Dashboard() {
       {/* Main Content */}
       <div className="flex flex-col mt-3 px-4 flex-1 xl:ml-80 h-screen relative">
         {/* Navbar Cố Định */}
-        <DashboardNavbar className="fixed top-0 left-0 right-0 z-10 bg-white shadow-md p-4" />
+        <DashboardNavbar className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md p-4" />
 
         {/* Nội dung chính có scroll */}
         <div className="flex-1 overflow-auto p-4 pb-10">

@@ -3,25 +3,25 @@ import { Box, FormControl, TextField } from '@mui/material';
 import { Controller } from 'react-hook-form';
 
 TextInput.propTypes = {
-    label: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    id: PropTypes.string,
-    noteMessage: PropTypes.string,
-    required: PropTypes.bool,
-    control: PropTypes.object.isRequired,
-    name: PropTypes.string.isRequired,
-    rules: PropTypes.object,
-    error: PropTypes.bool,
-    className: PropTypes.string,
-    defaultValue: PropTypes.string, 
-    containerClassName: PropTypes.string,
-    onFieldChange: PropTypes.func,
-    tooltip: PropTypes.node,
-    placeholder: PropTypes.string,
-    multiline: PropTypes.bool,
-    type : PropTypes.string,
-    sx: PropTypes.object,
-  };
-  
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  id: PropTypes.string,
+  noteMessage: PropTypes.string,
+  required: PropTypes.bool,
+  control: PropTypes.object.isRequired,
+  name: PropTypes.string.isRequired,
+  rules: PropTypes.object,
+  error: PropTypes.bool,
+  className: PropTypes.string,
+  defaultValue: PropTypes.string,
+  containerClassName: PropTypes.string,
+  onFieldChange: PropTypes.func,
+  tooltip: PropTypes.node,
+  placeholder: PropTypes.string,
+  multiline: PropTypes.bool,
+  type: PropTypes.string,
+  sx: PropTypes.object,
+};
+
 export default function TextInput({
   label,
   id,
@@ -38,7 +38,7 @@ export default function TextInput({
   ...props
 }) {
   const { placeholder } = props;
- 
+
   return (
     <div className={containerClassName}>
       <Controller
@@ -78,8 +78,7 @@ export default function TextInput({
                 }}
                 placeholder={
                   placeholder ??
-                  `${'Nhập'} ${
-                    typeof label === 'string' ? label.toLowerCase() : ''
+                  `${'Nhập'} ${typeof label === 'string' ? label.toLowerCase() : ''
                   }`
                 }
                 onBlur={() => {
@@ -88,28 +87,28 @@ export default function TextInput({
                 error={error}
                 sx={{
                   '& .MuiInputBase-input': {
-                    padding: props?.multiline ? '10px' : '12px 18px', 
+                    padding: props?.multiline ? '10px' : '12px 18px',
                   },
                   '& .MuiOutlinedInput-root': {
                     borderRadius: props?.multiline ? '8px' : '40px',
                     fontSize: '14px',
                     fontWeight: '500',
                     color: '#232D3A',
-                    minHeight: '50px', 
+                    minHeight: '50px',
                     height: 'fit-content',
                     '& fieldset': {
                       border: `1px solid ${!error ? '#E9EAEB' : '#BC2649'}`,
                     },
                     '&.Mui-focused fieldset': {
-                      border: `1px solid ${!error ? '#2C80FF' : '#BC2649'}`,
+                      border: `1px solid ${!error ? '#FF6600' : '#BC2649'}`,
                     },
                     '&:hover fieldset': {
-                      border: `1px solid ${!error ? '#2C80FF' : '#BC2649'}`,
+                      border: `1px solid ${!error ? '#FF6600' : '#BC2649'}`,
                     },
                   },
                   ...props.sx,
                 }}
-                
+
                 onKeyDown={(e) => {
                   if (props?.type === 'number') {
                     const charCode = typeof e.which === 'undefined' ? e.keyCode : e.which;
@@ -123,9 +122,8 @@ export default function TextInput({
               />
               {noteMessage && (
                 <span
-                  className={`mt-[10px] text-[12px] block ${
-                    error ? 'text-red' : 'text-secondaryText70'
-                  }`}
+                  className={`mt-[10px] text-[12px] block ${error ? 'text-red' : 'text-secondaryText70'
+                    }`}
                 >
                   {noteMessage}
                 </span>

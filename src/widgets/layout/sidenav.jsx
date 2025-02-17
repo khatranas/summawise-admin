@@ -31,9 +31,9 @@ export function Sidenav({ brandName, routes }) {
           <Link to="/" className="py-6 text-center">
             <Typography
               variant="h6"
-              className={`text-xl ${sidenavType === "dark" ? "text-white" : "text-blue-gray-700"}`}
+              className={`text-xl ml-3 ${sidenavType === "dark" ? "text-white" : "text-blue-gray-700"}`}
             >
-              {brandName}
+              SUMMAWISE
             </Typography>
           </Link>
         </div>
