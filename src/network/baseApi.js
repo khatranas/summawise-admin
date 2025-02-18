@@ -4,7 +4,7 @@ import { axiosApi } from './api/api';
 import Cookies from "js-cookie";
 
 const AppConfig = {
-	apiBase: import.meta.env.VITE_API_URL,
+    apiBase: "http://localhost:8000/api/",
 };
 const baseQuery = fetchBaseQuery({
 	baseUrl: AppConfig.apiBase,
