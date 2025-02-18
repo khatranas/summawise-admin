@@ -176,8 +176,8 @@ export function Home() {
             </table>
           </CardBody>
 
-        </Card>
-        <Card className="border border-blue-gray-100 shadow-sm">
+        </Card> */}
+        {/* <Card className="border border-blue-gray-100 shadow-sm">
           <CardHeader
             floated={false}
             shadow={false}
