@@ -9,7 +9,7 @@ export const statisticsCardsData = [
   {
     color: "gray",
     icon: UsersIcon,
-    title: "Số học viên tham gia",
+    title: "Số người dùng tham gia",
     value: "2,300",
     footer: {
       color: "text-green-500",
@@ -20,7 +20,7 @@ export const statisticsCardsData = [
   {
     color: "gray",
     icon: ChartBarIcon,
-    title: "Bài học đã được tải lên",
+    title: "Tài liệu đã được tải lên",
     value: "1,452",
     footer: {
       color: "text-green-500",

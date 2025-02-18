@@ -2,7 +2,7 @@ import axiosService from "../axiosService.service"
 
 export const axiosApi = {
     login: async (payload: any) => {
-        return await axiosService.post('/auth/login', payload)
+        return await axiosService.post('api/auth/login', payload)
     },
     register: async (payload: {
         email: string,
