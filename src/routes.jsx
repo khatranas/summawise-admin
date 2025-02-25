@@ -63,14 +63,14 @@ export const routes = [
     layout: "auth",
     pages: [
       {
-        // icon: <ServerStackIcon {...icon} />,
-        // name: "Đăng nhập",
+        icon: <ServerStackIcon {...icon} />,
+        name: "Đăng nhập",
         path: "/login",
         element: <SignIn />,
       },
       {
-        // icon: <RectangleStackIcon {...icon} />,
-        // name: "Đăng ký",
+        icon: <RectangleStackIcon {...icon} />,
+        name: "Đăng ký",
         path: "/sign-up",
         element: <SignUp />,
       },

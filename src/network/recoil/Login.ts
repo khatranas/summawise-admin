@@ -5,7 +5,7 @@ export const emailAtom = atom<string>({
     default: ""
 });
 
-export const passwordAtom = atom<string>({
-    key: "passwordAtom",
-    default: ""
+export const isLoginAtom = atom<boolean>({
+    key: "isLoginAtom",
+    default: false
 });

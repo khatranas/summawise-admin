@@ -21,11 +21,11 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { 
-  useCreateUserMutation, 
-  useDeleteUserMutation, 
-  useGetUserQuery, 
-  useUpdateUserMutation 
+import {
+  useCreateUserMutation,
+  useDeleteUserMutation,
+  useGetUserQuery,
+  useUpdateUserMutation
 } from "@/network/api/authen";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -154,12 +154,12 @@ function Accounts() {
     }
     return color;
   };
-  
+
   const CustomAvatar = ({ name }) => {
     const displayName = name || "U"; // Default to 'U' if no name is provided
     const firstLetter = displayName.charAt(0).toUpperCase(); // Get the first letter of the name
     const bgColor = stringToColor(displayName); // Generate the background color from the name
-  
+
     // Using inline styles for better control of background color
     const avatarStyle = {
       backgroundColor: bgColor,
@@ -169,13 +169,13 @@ function Accounts() {
       fontSize: "20px", // Make sure the letter is big enough
     };
     return (
-         <Avatar style={avatarStyle}>
-      {firstLetter}
-    </Avatar>
+      <Avatar style={avatarStyle}>
+        {firstLetter}
+      </Avatar>
 
     );
   };
-  
+
 
   return (
     <div style={{ padding: 20 }}>
@@ -221,7 +221,7 @@ function Accounts() {
                 <TableRow key={account._id} hover>
                   <TableCell>{index + 1}</TableCell>
                   <TableCell>
-                  <CustomAvatar name={account?.name} />
+                    <CustomAvatar name={account?.name} />
                   </TableCell>
                   <TableCell>{account.name}</TableCell>
                   <TableCell>{account.email}</TableCell>
@@ -303,8 +303,8 @@ function Accounts() {
             fullWidth
             margin="normal"
           >
-            <MenuItem value="admin">Quản trị viên</MenuItem>
-            <MenuItem value="user">Người dùng</MenuItem>
+            <MenuItem value="admin">Quản trị viên 1</MenuItem>
+            <MenuItem value="user">Quản trị viên 2</MenuItem>
           </TextField>
           <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
             <Button onClick={() => setOpenCreateModal(false)} sx={{ mr: 1 }}>
@@ -352,8 +352,8 @@ function Accounts() {
                 fullWidth
                 margin="normal"
               >
-                <MenuItem value="admin">Quản trị viên</MenuItem>
-                <MenuItem value="user">Người dùng</MenuItem>
+                <MenuItem value="admin">Quản trị viên 1</MenuItem>
+                <MenuItem value="user">Quản trị viên 2</MenuItem>
               </TextField>
               <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
                 <Button onClick={() => setOpenEditModal(false)} sx={{ mr: 1 }}>

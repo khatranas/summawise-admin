@@ -1,6 +1,6 @@
 import { api } from '../baseApi';
 const AppConfig = {
-    apiBase: "http://localhost:8000/api/",
+	apiBase: import.meta.env.VITE_API_URL,
 };
 
 export const userAPI = api.injectEndpoints({
@@ -31,7 +31,7 @@ export const userAPI = api.injectEndpoints({
 				body: data,
 			}),
 		}),
-		getUserById : builder.query({
+		getUserById: builder.query({
 			query: (id) => ({
 				url: `${AppConfig.apiBase}users/${id}`,
 				method: 'GET',
