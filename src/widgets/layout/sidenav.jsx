@@ -9,7 +9,7 @@ import {
 import { useMaterialTailwindController, setOpenSidenav } from "@/context";
 import logo from "../../assets/imgs/sumawise.png"
 
-export function Sidenav({ brandName, routes }) {
+export function Sidenav({ routes }) {
   const [controller, dispatch] = useMaterialTailwindController();
   const { sidenavColor, sidenavType, openSidenav } = controller;
   const sidenavTypes = {
@@ -21,7 +21,7 @@ export function Sidenav({ brandName, routes }) {
   return (
     <aside
       className={`${sidenavTypes[sidenavType]} ${openSidenav ? "translate-x-0" : "-translate-x-80"
-        } fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100`}
+        } fixed inset-0 z-50 my-4 ml-4 h-[calc(100vh-32px)] w-60 rounded-xl transition-transform duration-300 xl:translate-x-0 border border-blue-gray-100`}
     >
       <div
         className={`relative`}

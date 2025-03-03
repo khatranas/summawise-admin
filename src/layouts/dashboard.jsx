@@ -22,7 +22,7 @@ export function Dashboard() {
       />
 
       {/* Main Content */}
-      <div className="flex flex-col mt-3 px-4 flex-1 xl:ml-80 h-screen relative">
+      <div className="flex flex-col mt-3 px-4 flex-1 xl:ml-64 h-screen relative">
         {/* Navbar Cố Định */}
         <DashboardNavbar className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md p-4" />
 

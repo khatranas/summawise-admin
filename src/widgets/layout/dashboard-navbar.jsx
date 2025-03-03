@@ -1,26 +1,42 @@
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, NavLink, useNavigate } from "react-router-dom";
 import {
   Navbar,
   Typography,
-  Button,
   IconButton,
   Breadcrumbs,
-  Input,
 } from "@material-tailwind/react";
 import {
-  UserCircleIcon,
   Bars3Icon,
 } from "@heroicons/react/24/solid";
 import {
   useMaterialTailwindController,
   setOpenSidenav,
 } from "@/context";
+import { useGetProfileQuery } from "@/network/api/authen";
+import { useCookies } from "react-cookie";
+import { Menu, Transition } from "@headlessui/react";
+import { Avatar } from "@mui/material";
+import { Fragment } from "react";
 
 export function DashboardNavbar() {
   const [controller, dispatch] = useMaterialTailwindController();
   const { fixedNavbar, openSidenav } = controller;
   const { pathname } = useLocation();
   const [layout, page] = pathname.split("/").filter((el) => el !== "");
+  const { data } = useGetProfileQuery();
+  const navigate = useNavigate();
+  const [cookies, removeCookie] = useCookies(['accessToken']);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    if (cookies.accessToken) {
+      removeCookie('accessToken', { path: '/' });
+    }
+    navigate('/auth/login');
+  };
+
+  const name = data?.name || "U";
+  const firstLetter = name.charAt(0).toUpperCase();
 
   return (
     <Navbar
@@ -60,9 +76,6 @@ export function DashboardNavbar() {
           </Typography>
         </div>
         <div className="flex items-center">
-          {/* <div className="mr-auto md:mr-4 md:w-56">
-            <Input label="Tìm kiếm" />
-          </div> */}
           <IconButton
             variant="text"
             color="blue-gray"
@@ -71,122 +84,52 @@ export function DashboardNavbar() {
           >
             <Bars3Icon strokeWidth={3} className="h-6 w-6 text-blue-gray-500" />
           </IconButton>
-          {/* {isLogin == true ? (
-            <div>
-              <span>Đã đăng nhập</span>
-              <IconButton
-                variant="text"
-                color="blue-gray"
-                className="grid xl:hidden"
-              >
-                <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
-              </IconButton>
-            </div>
-          ) : (
-            <Link to="/auth/login">
-              <Button
-                variant="text"
-                color="blue-gray"
-                className="hidden items-center gap-1 px-4 xl:flex normal-case"
-              >
-                <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
-                Đăng nhập
-              </Button>
-              <IconButton
-                variant="text"
-                color="blue-gray"
-                className="grid xl:hidden"
-              >
-                <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
-              </IconButton>
-            </Link>
-          )} */}
+          {/* User Profile & Auth */}
+          {data?.name ? (
+            <Menu as="div" className="relative">
+              <Menu.Button className="flex items-center space-x-2 text-gray-700 hover:text-primaryColor transition">
+                <Avatar sx={{ bgcolor: "#FF6600", width: 40, height: 40, fontSize: "1.1rem" }}>
+                  {firstLetter}
+                </Avatar>
+                <span className="font-semibold">{data?.email}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="-mt-2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 20l-4-4h8l-4 4z" />
+                </svg>
+              </Menu.Button>
 
-          {/* <Menu>
-            <MenuHandler>
-              <IconButton variant="text" color="blue-gray">
-                <BellIcon className="h-5 w-5 text-blue-gray-500" />
-              </IconButton>
-            </MenuHandler>
-            <MenuList className="w-max border-0">
-              <MenuItem className="flex items-center gap-3">
-                <Avatar
-                  src="https://demos.creative-tim.com/material-dashboard/assets/img/team-2.jpg"
-                  alt="item-1"
-                  size="sm"
-                  variant="circular"
-                />
-                <div>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="mb-1 font-normal"
-                  >
-                    <strong>New message</strong> from Laur
-                  </Typography>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="flex items-center gap-1 text-xs font-normal opacity-60"
-                  >
-                    <ClockIcon className="h-3.5 w-3.5" /> 13 minutes ago
-                  </Typography>
-                </div>
-              </MenuItem>
-              <MenuItem className="flex items-center gap-4">
-                <Avatar
-                  src="https://demos.creative-tim.com/material-dashboard/assets/img/small-logos/logo-spotify.svg"
-                  alt="item-1"
-                  size="sm"
-                  variant="circular"
-                />
-                <div>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="mb-1 font-normal"
-                  >
-                    <strong>New album</strong> by Travis Scott
-                  </Typography>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="flex items-center gap-1 text-xs font-normal opacity-60"
-                  >
-                    <ClockIcon className="h-3.5 w-3.5" /> 1 day ago
-                  </Typography>
-                </div>
-              </MenuItem>
-              <MenuItem className="flex items-center gap-4">
-                <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-tr from-blue-gray-800 to-blue-gray-900">
-                  <CreditCardIcon className="h-4 w-4 text-white" />
-                </div>
-                <div>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="mb-1 font-normal"
-                  >
-                    Payment successfully completed
-                  </Typography>
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="flex items-center gap-1 text-xs font-normal opacity-60"
-                  >
-                    <ClockIcon className="h-3.5 w-3.5" /> 2 days ago
-                  </Typography>
-                </div>
-              </MenuItem>
-            </MenuList>
-          </Menu> */}
-          {/* <IconButton
-            variant="text"
-            color="blue-gray"
-            onClick={() => setOpenConfigurator(dispatch, true)}
-          >
-            <Cog6ToothIcon className="h-5 w-5 text-blue-gray-500" />
-          </IconButton> */}
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-150"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-100"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl border">
+                  <Menu.Item>
+                    {({ active }) => (
+                      <button
+                        onClick={handleLogout}
+                        className={`block w-full text-left px-4 py-2 text-gray-700 font-semibold ${active ? "bg-gray-100 text-primaryColor" : ""}`}
+                      >
+                        Đăng xuất
+                      </button>
+                    )}
+                  </Menu.Item>
+                </Menu.Items>
+              </Transition>
+            </Menu>
+          ) : (
+            <div className="flex space-x-4">
+              <NavLink
+                to="/auth/login"
+                className="px-5 py-2 rounded-lg bg-primaryColor text-white font-semibold hover:bg-orange-600 transition duration-300"
+              >
+                Đăng nhập
+              </NavLink>
+            </div>
+          )}
         </div>
       </div>
     </Navbar>

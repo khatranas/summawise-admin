@@ -1,16 +1,11 @@
 import {
+  CloudIcon,
   HomeIcon,
   UserGroupIcon,
-  UserIcon,
-  CloudIcon,
-  ServerStackIcon,
-  RectangleStackIcon,
-  FolderIcon,
-  StarIcon,
 } from "@heroicons/react/24/solid";
-import { Home, Profile, Tables, Notifications } from "@/pages/dashboard";
-import { SignIn, SignUp } from "@/pages/auth";
+import { Home } from "@/pages/dashboard";
 import Accounts from "./pages/dashboard/account";
+import { PaymentAcc } from "./pages/dashboard/paymentAcc";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -28,9 +23,15 @@ export const routes = [
       },
       {
         icon: <UserGroupIcon {...icon} />,
-        name: "Quản lý tài khoản",
+        name: "Tài khoản",
         path: "/account",
         element: <Accounts />,
+      },
+      {
+        icon: <CloudIcon {...icon} />,
+        name: "Gói tài khoản",
+        path: "/payment",
+        element: <PaymentAcc />,
       },
       // {
       //   icon: <UserIcon {...icon} />,
@@ -56,24 +57,6 @@ export const routes = [
       //   path: "/package",
       //   // element: <Notifications />,
       // },
-    ],
-  },
-  {
-    // title: "Tài khoản",
-    layout: "auth",
-    pages: [
-      {
-        icon: <ServerStackIcon {...icon} />,
-        name: "Đăng nhập",
-        path: "/login",
-        element: <SignIn />,
-      },
-      {
-        icon: <RectangleStackIcon {...icon} />,
-        name: "Đăng ký",
-        path: "/sign-up",
-        element: <SignUp />,
-      },
     ],
   },
 ];

@@ -5,12 +5,10 @@ import Background from "../../assets/imgs/background_login.png";
 import React from "react";
 import { axiosApi } from "@/network/api/api";
 import { toast } from "react-toastify";
-import { useSetRecoilState } from "recoil";
-import { isLoginAtom } from "@/network/recoil/Login";
+import Cookies from "js-cookie";
 
 export function SignIn() {
   const navigate = useNavigate();
-  // const setLogin = useSetRecoilState(isLoginAtom)
 
   const {
     control,
@@ -30,11 +28,9 @@ export function SignIn() {
         email: data.email,
         password: data.password
       });
-      if (response) {
-        toast.success("Đăng nhập thành công");
-        // setLogin(true)
-        navigate("/");
-      }
+      Cookies.set("accessToken", response.data.access_token, { path: "/" });
+      toast.success("Đăng nhập thành công");
+      navigate("/");
     } catch (error) {
       const errorMessage = error.response?.data?.message;
       toast.error(errorMessage ?? "Đăng nhập thất bại");
@@ -106,12 +102,6 @@ export function SignIn() {
 
           <div className="text-right text-sm font-bold text-gray-800">
             <a onClick={() => navigate("/forgot-password")}>Quên mật khẩu?</a>
-          </div>
-          <div className="flex items-center justify-center text-center text-sm mt-6 font-semibold">
-            <Typography.Text className="text-gray-800">Bạn chưa có tài khoản?</Typography.Text>
-            <Typography.Link className="ml-1" onClick={() => navigate("/auth/sign-up")}>
-              Đăng ký ngay
-            </Typography.Link>
           </div>
         </form>
       </div>

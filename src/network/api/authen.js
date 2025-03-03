@@ -31,12 +31,6 @@ export const userAPI = api.injectEndpoints({
 				body: data,
 			}),
 		}),
-		getUserById: builder.query({
-			query: (id) => ({
-				url: `${AppConfig.apiBase}users/${id}`,
-				method: 'GET',
-			}),
-		}),
 	}),
 	overrideExisting: false,
 });
@@ -45,6 +39,26 @@ export const {
 	useDeleteUserMutation,
 	useCreateUserMutation,
 	useUpdateUserMutation,
-	useGetUserByIdQuery,
 	useGetUserQuery,
 } = userAPI;
+
+
+
+
+
+export const checkoutAPI = api.injectEndpoints({
+	endpoints: (builder) => ({
+		getProfile: builder.query({
+			query: (params) => ({
+				url: `${AppConfig.apiBase}users/me`,
+				method: 'GET',
+				params,
+			}),
+		}),
+	}),
+	overrideExisting: false,
+});
+
+export const {
+	useGetProfileQuery
+} = checkoutAPI;

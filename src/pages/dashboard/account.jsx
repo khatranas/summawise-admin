@@ -180,7 +180,7 @@ function Accounts() {
   return (
     <div style={{ padding: 20 }}>
       <Typography variant="h4" gutterBottom>
-        Quản lý tài khoản
+        Tài khoản
       </Typography>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
         <TextField
@@ -205,7 +205,7 @@ function Accounts() {
           <TableHead>
             <TableRow style={{ backgroundColor: "#f5f5f5" }}>
               <TableCell>STT</TableCell>
-              <TableCell>Avatar</TableCell>
+              <TableCell>Ảnh đại diện</TableCell>
               <TableCell>Tên người dùng</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Vai trò</TableCell>

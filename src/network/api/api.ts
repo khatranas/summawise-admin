@@ -24,5 +24,8 @@ export const axiosApi = {
     },
     accountPost: async (id, params) => {
         return await axiosService.post(`/users/${id}`, params);
-    }
+    },
+    paymentGet: async () => {
+        return await axiosService.get('/payment/all-orders');
+    },
 }
