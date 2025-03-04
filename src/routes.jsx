@@ -1,9 +1,11 @@
 import {
-  CloudIcon,
   HomeIcon,
   UserGroupIcon,
+  CreditCardIcon,
+  CurrencyDollarIcon,
 } from "@heroicons/react/24/solid";
-import { Home } from "@/pages/dashboard";
+import { PricingPayment } from "./pages/dashboard/pricingPayment";
+import { Home } from "./pages/dashboard";
 import Accounts from "./pages/dashboard/account";
 import { PaymentAcc } from "./pages/dashboard/paymentAcc";
 
@@ -28,10 +30,16 @@ export const routes = [
         element: <Accounts />,
       },
       {
-        icon: <CloudIcon {...icon} />,
-        name: "Gói tài khoản",
+        icon: <CreditCardIcon {...icon} />,
+        name: "Đăng ký gói",
         path: "/payment",
         element: <PaymentAcc />,
+      },
+      {
+        icon: <CurrencyDollarIcon {...icon} />,
+        name: "Gói giá tài khoản",
+        path: "/pricing",
+        element: <PricingPayment />,
       },
       // {
       //   icon: <UserIcon {...icon} />,
@@ -52,7 +60,7 @@ export const routes = [
       //   // element: <Notifications />,
       // },
       // {
-      //   icon: <CloudIcon {...icon} />,
+      //   icon: <ArchiveBoxIcon {...icon} />,
       //   name: "Quản lý gói đăng ký",
       //   path: "/package",
       //   // element: <Notifications />,

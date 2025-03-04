@@ -178,7 +178,7 @@ function Accounts() {
 
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 10 }}>
       <Typography variant="h4" gutterBottom>
         Tài khoản
       </Typography>

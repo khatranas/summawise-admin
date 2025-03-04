@@ -1,9 +1,8 @@
 import { axiosApi } from '@/network/api/api';
-import { Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, TablePagination } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, TextField, InputAdornment } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
+import SearchIcon from "@mui/icons-material/Search";
 
 export const PaymentAcc = () => {
     const [paymentAcc, setPaymentAcc] = useState([]);
@@ -35,29 +34,59 @@ export const PaymentAcc = () => {
         setPage(0);
     };
 
+
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const filteredData = paymentAcc?.filter((paymentAcc) => {
+        const lowerSearchTerm = searchTerm.toLowerCase();
+
+        return (
+            paymentAcc.orderId.toLowerCase().includes(lowerSearchTerm) ||
+            paymentAcc.userId.toLowerCase().includes(lowerSearchTerm)
+        );
+    });
+
     return (
         <div style={{ padding: 20 }}>
             <Typography variant="h4" gutterBottom>
-                Gói tài khoản
+                Đăng ký gói
             </Typography>
-
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20, marginTop: 10 }}>
+                <TextField
+                    variant="outlined"
+                    placeholder="Tìm kiếm..."
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+            </div>
             <TableContainer component={Paper} elevation={3}>
                 <Table>
                     <TableHead>
                         <TableRow style={{ backgroundColor: "#f5f5f5" }}>
                             <TableCell>STT</TableCell>
                             <TableCell>Mã gói</TableCell>
-                            <TableCell>ID tài khoản</TableCell>
+                            <TableCell>Mã người đăng kí</TableCell>
                             <TableCell>Trạng thái</TableCell>
                             <TableCell>Số tiền</TableCell>
                             <TableCell>Ngày tạo</TableCell>
                             <TableCell>Ngày hoàn thành</TableCell>
-                            <TableCell>Hành động</TableCell>
+                            {/* <TableCell>Hành động</TableCell> */}
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {paymentAcc.length > 0 ? (
-                            paymentAcc.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order, index) => (
+                        {filteredData && filteredData.length > 0 ? (
+                            filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order, index) => (
                                 <TableRow key={order._id} hover>
                                     <TableCell>{page * rowsPerPage + index + 1}</TableCell>
                                     <TableCell>{order.orderId}</TableCell>
@@ -72,14 +101,14 @@ export const PaymentAcc = () => {
                                     <TableCell>
                                         {order.completedAt ? new Date(order.completedAt).toLocaleString() : <span style={{ color: "red" }}>Chưa hoàn thành</span>}
                                     </TableCell>
-                                    <TableCell>
+                                    {/* <TableCell>
                                         <IconButton onClick={() => console.log("Sửa đơn hàng", order)}>
                                             <EditIcon color="primary" />
                                         </IconButton>
                                         <IconButton onClick={() => console.log("Xóa đơn hàng", order._id)}>
                                             <DeleteIcon color="error" />
                                         </IconButton>
-                                    </TableCell>
+                                    </TableCell> */}
                                 </TableRow>
                             ))
                         ) : (

@@ -28,4 +28,7 @@ export const axiosApi = {
     paymentGet: async () => {
         return await axiosService.get('/payment/all-orders');
     },
+    pricingGet: async () => {
+        return await axiosService.get('/pricing');
+    },
 }
