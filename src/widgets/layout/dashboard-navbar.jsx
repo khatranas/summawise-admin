@@ -37,6 +37,9 @@ export function DashboardNavbar() {
 
   const name = data?.name || "U";
   const firstLetter = name.charAt(0).toUpperCase();
+  const vietnameseLayout = layout === "dashboard" ? "Bảng điều khiển" : layout;
+  const vietnamesePage = page === "home" ? "Trang chủ" : page === "account" ? "Tài khoản" : page === "payment" ? "Thanh toán" : page === "pricing" ? "Gói tài khoản" : page;
+
 
   return (
     <Navbar
@@ -51,8 +54,7 @@ export function DashboardNavbar() {
       <div className="flex flex-col-reverse justify-between gap-6 md:flex-row md:items-center">
         <div className="capitalize">
           <Breadcrumbs
-            className={`bg-transparent p-0 transition-all ${fixedNavbar ? "mt-1" : ""
-              }`}
+            className={`bg-transparent p-0 transition-all ${fixedNavbar ? "mt-1" : ""}`}
           >
             <Link to={`/${layout}`}>
               <Typography
@@ -60,7 +62,7 @@ export function DashboardNavbar() {
                 color="blue-gray"
                 className="font-normal opacity-50 transition-all hover:text-blue-500 hover:opacity-100"
               >
-                {layout}
+                {vietnameseLayout}
               </Typography>
             </Link>
             <Typography
@@ -68,12 +70,9 @@ export function DashboardNavbar() {
               color="blue-gray"
               className="font-normal"
             >
-              {page}
+              {vietnamesePage}
             </Typography>
           </Breadcrumbs>
-          <Typography variant="h6" color="blue-gray">
-            {page}
-          </Typography>
         </div>
         <div className="flex items-center">
           <IconButton

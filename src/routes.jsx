@@ -19,7 +19,7 @@ export const routes = [
     pages: [
       {
         icon: <HomeIcon {...icon} />,
-        name: "Thống kê",
+        name: "Trang chủ",
         path: "/home",
         element: <Home />,
       },
@@ -31,40 +31,16 @@ export const routes = [
       },
       {
         icon: <CreditCardIcon {...icon} />,
-        name: "Đăng ký gói",
+        name: "Thanh toán",
         path: "/payment",
         element: <PaymentAcc />,
       },
       {
         icon: <CurrencyDollarIcon {...icon} />,
-        name: "Gói giá tài khoản",
+        name: "Gói tài khoản",
         path: "/pricing",
         element: <PricingPayment />,
       },
-      // {
-      //   icon: <UserIcon {...icon} />,
-      //   name: "Quản lý người dùng",
-      //   path: "/user",
-      //   element: <Tables />,
-      // },
-      // {
-      //   icon: <FolderIcon {...icon} />,
-      //   name: "Quản lý tài liệu",
-      //   path: "/file",
-      //   // element: <Notifications />,
-      // },
-      // {
-      //   icon: <StarIcon {...icon} />,
-      //   name: "Quản lý bảng xếp hạng",
-      //   path: "/role",
-      //   // element: <Notifications />,
-      // },
-      // {
-      //   icon: <ArchiveBoxIcon {...icon} />,
-      //   name: "Quản lý gói đăng ký",
-      //   path: "/package",
-      //   // element: <Notifications />,
-      // },
     ],
   },
 ];

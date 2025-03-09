@@ -145,7 +145,7 @@ export const PricingPayment = () => {
     return (
         <div style={{ padding: 10 }}>
             <Typography variant="h4" gutterBottom>
-                Gói giá tài khoản
+                Gói tài khoản
             </Typography>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20, marginTop: 10 }}>
                 <TextField
@@ -238,7 +238,7 @@ export const PricingPayment = () => {
             <Modal open={openCreateModal} onClose={() => setOpenCreateModal(false)}>
                 <Box sx={modalStyle}>
                     <Typography variant="h6" component="h2" gutterBottom>
-                        Tạo tài gói tài khoản mới
+                        Thêm gói tài khoản
                     </Typography>
                     <TextField
                         label="Tên gói"

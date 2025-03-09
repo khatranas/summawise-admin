@@ -53,7 +53,7 @@ export const PaymentAcc = () => {
     return (
         <div style={{ padding: 20 }}>
             <Typography variant="h4" gutterBottom>
-                Đăng ký gói
+                Thanh toán
             </Typography>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20, marginTop: 10 }}>
                 <TextField
