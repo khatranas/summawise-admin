@@ -29,7 +29,7 @@ export const axiosApi = {
   pricingGet: async () => {
     return await axiosService.get("/pricing");
   },
-  dashBoardUsers: async (params = {}) => {
-    return await axiosService.get(`/users`, { params });
+  dashBoardUsers: async (_params = {}) => {
+    return await axiosService.get(`/users`);
   },
 };

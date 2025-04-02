@@ -4,6 +4,7 @@ import {
   UserPlusIcon,
   UsersIcon,
 } from "@heroicons/react/24/solid";
+import { Typography } from "@material-tailwind/react";
 import { createElement, useEffect, useState } from "react";
 import {
   Bar,
@@ -15,27 +16,57 @@ import {
 } from "recharts";
 
 export function Home() {
+  const [users, setUsers] = useState([]);
   const [filters, setFilters] = useState({
     search: "",
-    limit: 10,
-    skip: 0,
-    sort: "-createdAt",
+    package: "",
+    fromDate: "",
+    toDate: "",
   });
-  const [users, setUsers] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
 
+  // Handle filter change
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Clear a single filter input
+  const clearFilter = (name) => {
+    setFilters((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  // Apply filters
+  const applyFilters = () => {
+    setFilteredData(
+      users.filter((user) => {
+        const lowerSearch = filters.search.toLowerCase();
+        const userDate = new Date(user.joinDate);
+        const fromDate = filters.fromDate ? new Date(filters.fromDate) : null;
+        const toDate = filters.toDate ? new Date(filters.toDate) : null;
+
+        return (
+          (!filters.search ||
+            user.email.toLowerCase().includes(lowerSearch) ||
+            user.name.toLowerCase().includes(lowerSearch)) &&
+          (!filters.package || user.package === filters.package) &&
+          (!fromDate || userDate >= fromDate) &&
+          (!toDate || userDate <= toDate)
+        );
+      }),
+    );
+  };
+
   const fetchUsers = async () => {
     try {
-      const response = await axiosApi.dashBoardUsers(filters);
+      const response = await axiosApi.dashBoardUsers();
       if (response && Array.isArray(response)) {
         setUsers(response);
+        setFilteredData(response);
       }
     } catch (error) {
       setUsers([]);
+      setFilteredData([]);
     }
   };
 
@@ -44,11 +75,16 @@ export function Home() {
   }, []);
 
   const premiumUsers =
-    users?.filter((u) => u.package === "premium").length || 0;
-  const freeUsers = users?.length ? users.length - premiumUsers : 0;
+    filteredData.filter((u) => u.package === "premium").length || 0;
+  const freeUsers = filteredData.length
+    ? filteredData.length - premiumUsers
+    : 0;
 
   return (
-    <div className="bg-gray-100 min-h-screen p-8">
+    <div className="bg-gray-100 min-h-screen">
+      <Typography variant="h4" gutterBottom className="text-primaryColor mb-10">
+        Thống kê người dùng
+      </Typography>
       {/* Bộ lọc */}
       <div className="flex flex-wrap gap-6 mb-6">
         {/* Tìm kiếm */}
@@ -56,62 +92,95 @@ export function Home() {
           <label className="block text-sm font-medium text-primaryColor mb-2">
             Tìm kiếm
           </label>
-          <input
-            type="text"
-            name="search"
-            placeholder="Tìm kiếm theo email hoặc tên"
-            value={filters.search}
-            onChange={handleFilterChange}
-            className="p-3 w-full border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-primaryDark"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Tìm kiếm theo tên hoặc email
-          </p>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              name="search"
+              placeholder="Tìm kiếm theo email hoặc tên"
+              value={filters.search}
+              onChange={handleFilterChange}
+              className="p-3 w-full border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-primaryDark"
+            />
+            <button
+              onClick={() => clearFilter("search")}
+              className="text-gray-400"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
-        {/* Số lượng */}
-        <div className="w-full sm:w-32">
-          <label className="block text-sm font-medium text-primaryColor mb-2">
-            Số lượng
-          </label>
-          <input
-            type="number"
-            name="limit"
-            placeholder="Số lượng"
-            value={filters.limit}
-            onChange={handleFilterChange}
-            className="p-3 w-full border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-primaryDark"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Số lượng kết quả trên mỗi trang
-          </p>
-        </div>
-
-        {/* Sắp xếp */}
+        {/* Gói */}
         <div className="w-full sm:w-48">
           <label className="block text-sm font-medium text-primaryColor mb-2">
-            Sắp xếp
+            Gói
           </label>
-          <select
-            name="sort"
-            value={filters.sort}
-            onChange={handleFilterChange}
-            className="p-3 w-full border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-primaryDark"
-          >
-            <option value="-createdAt">Mới nhất</option>
-            <option value="createdAt">Cũ nhất</option>
-            <option value="name">Tên (A-Z)</option>
-            <option value="-name">Tên (Z-A)</option>
-          </select>
-          <p className="text-xs text-gray-500 mt-1">
-            Sắp xếp kết quả (VD: name, -createdAt)
-          </p>
+          <div className="flex items-center gap-2">
+            <select
+              name="package"
+              value={filters.package}
+              onChange={handleFilterChange}
+              className="p-3 w-full border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-primaryDark"
+            >
+              <option value="">Tất cả</option>
+              <option value="premium">VIP</option>
+              <option value="free">Free</option>
+            </select>
+            <button
+              onClick={() => clearFilter("package")}
+              className="text-gray-400"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        {/* Ngày tham gia */}
+        <div className="w-full sm:w-48">
+          <label className="block text-sm font-medium text-primaryColor mb-2">
+            Từ ngày
+          </label>
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              name="fromDate"
+              value={filters.fromDate}
+              onChange={handleFilterChange}
+              className="p-3 w-full border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-primaryDark"
+            />
+            <button
+              onClick={() => clearFilter("fromDate")}
+              className="text-gray-400"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+        <div className="w-full sm:w-48">
+          <label className="block text-sm font-medium text-primaryColor mb-2">
+            Đến ngày
+          </label>
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              name="toDate"
+              value={filters.toDate}
+              onChange={handleFilterChange}
+              className="p-3 w-full border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-primaryDark"
+            />
+            <button
+              onClick={() => clearFilter("toDate")}
+              className="text-gray-400"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Nút lọc */}
         <div className="w-full sm:w-auto mt-8">
           <button
-            onClick={fetchUsers}
+            onClick={applyFilters}
             className="px-6 py-2 bg-primaryColor text-white rounded-md shadow-md hover:bg-primaryDark transition w-full sm:w-auto"
           >
             Lọc
@@ -158,14 +227,14 @@ export function Home() {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
+            {filteredData.map((user) => (
               <tr key={user._id} className="hover:bg-gray-50 transition">
                 <td className="px-6 py-4 text-sm text-gray-700">{user.name}</td>
                 <td className="px-6 py-4 text-sm text-gray-700">
                   {user.email}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  {user.package}
+                  {user.package === "premium" ? "Vip" : user.package}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
                   {new Date(user.joinDate).toLocaleDateString()}
@@ -196,6 +265,7 @@ export function Home() {
   );
 }
 
+// StatisticsCard component
 const StatisticsCard = ({ icon, title, value }) => (
   <div className="w-full p-6 bg-white shadow rounded-lg flex flex-col items-center text-center">
     {createElement(icon, { className: "w-8 h-8 text-primaryColor" })}
