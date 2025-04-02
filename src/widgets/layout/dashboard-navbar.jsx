@@ -1,22 +1,17 @@
-import { useLocation, Link, NavLink, useNavigate } from "react-router-dom";
+import { setOpenSidenav, useMaterialTailwindController } from "@/context";
+import { useGetProfileQuery } from "@/network/api/authen";
+import { Menu, Transition } from "@headlessui/react";
+import { Bars3Icon } from "@heroicons/react/24/solid";
 import {
+  Breadcrumbs,
+  IconButton,
   Navbar,
   Typography,
-  IconButton,
-  Breadcrumbs,
 } from "@material-tailwind/react";
-import {
-  Bars3Icon,
-} from "@heroicons/react/24/solid";
-import {
-  useMaterialTailwindController,
-  setOpenSidenav,
-} from "@/context";
-import { useGetProfileQuery } from "@/network/api/authen";
-import { useCookies } from "react-cookie";
-import { Menu, Transition } from "@headlessui/react";
 import { Avatar } from "@mui/material";
 import { Fragment } from "react";
+import { useCookies } from "react-cookie";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 
 export function DashboardNavbar() {
   const [controller, dispatch] = useMaterialTailwindController();
@@ -25,42 +20,53 @@ export function DashboardNavbar() {
   const [layout, page] = pathname.split("/").filter((el) => el !== "");
   const { data } = useGetProfileQuery();
   const navigate = useNavigate();
-  const [cookies, removeCookie] = useCookies(['accessToken']);
+  const [cookies, removeCookie] = useCookies(["accessToken"]);
 
   const handleLogout = () => {
     localStorage.clear();
     if (cookies.accessToken) {
-      removeCookie('accessToken', { path: '/' });
+      removeCookie("accessToken", { path: "/" });
     }
-    navigate('/auth/login');
+    navigate("/auth/login");
   };
 
   const name = data?.name || "U";
   const firstLetter = name.charAt(0).toUpperCase();
   const vietnameseLayout = layout === "dashboard" ? "Bảng điều khiển" : layout;
-  const vietnamesePage = page === "home" ? "Trang chủ" : page === "account" ? "Tài khoản" : page === "payment" ? "Thanh toán" : page === "pricing" ? "Gói tài khoản" : page;
-
+  const vietnamesePage =
+    page === "home"
+      ? "Trang chủ"
+      : page === "account"
+      ? "Tài khoản"
+      : page === "payment"
+      ? "Thanh toán"
+      : page === "pricing"
+      ? "Gói tài khoản"
+      : page;
 
   return (
     <Navbar
       color={fixedNavbar ? "white" : "transparent"}
-      className={`rounded-xl transition-all ${fixedNavbar
-        ? "sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5"
-        : "px-0 py-1"
-        }`}
+      className={`rounded-xl transition-all ${
+        fixedNavbar
+          ? "sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5"
+          : "px-0 py-1"
+      }`}
       fullWidth
       blurred={fixedNavbar}
     >
       <div className="flex flex-col-reverse justify-between gap-6 md:flex-row md:items-center">
         <div className="capitalize">
           <Breadcrumbs
-            className={`bg-transparent p-0 transition-all ${fixedNavbar ? "mt-1" : ""}`}
+            className={`bg-transparent p-0 transition-all ${
+              fixedNavbar ? "mt-1" : ""
+            }`}
           >
             <Link to={`/${layout}`}>
               <Typography
                 variant="small"
                 color="blue-gray"
-                className="font-normal opacity-50 transition-all hover:text-blue-500 hover:opacity-100"
+                className="font-normal opacity-50 transition-all hover:text-primaryDark hover:opacity-100"
               >
                 {vietnameseLayout}
               </Typography>
@@ -87,11 +93,29 @@ export function DashboardNavbar() {
           {data?.name ? (
             <Menu as="div" className="relative">
               <Menu.Button className="flex items-center space-x-2 text-gray-700 hover:text-primaryColor transition">
-                <Avatar sx={{ bgcolor: "#FF6600", width: 40, height: 40, fontSize: "1.1rem" }}>
+                <Avatar
+                  sx={{
+                    bgcolor: "#FF6600",
+                    width: 40,
+                    height: 40,
+                    fontSize: "1.1rem",
+                  }}
+                >
                   {firstLetter}
                 </Avatar>
                 <span className="font-semibold">{data?.email}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="-mt-2" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="-mt-2"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M12 20l-4-4h8l-4 4z" />
                 </svg>
               </Menu.Button>
@@ -110,7 +134,9 @@ export function DashboardNavbar() {
                     {({ active }) => (
                       <button
                         onClick={handleLogout}
-                        className={`block w-full text-left px-4 py-2 text-gray-700 font-semibold ${active ? "bg-gray-100 text-primaryColor" : ""}`}
+                        className={`block w-full text-left px-4 py-2 text-gray-700 font-semibold ${
+                          active ? "bg-gray-100 text-primaryColor" : ""
+                        }`}
                       >
                         Đăng xuất
                       </button>
@@ -123,7 +149,7 @@ export function DashboardNavbar() {
             <div className="flex space-x-4">
               <NavLink
                 to="/auth/login"
-                className="px-5 py-2 rounded-lg bg-primaryColor text-white font-semibold hover:bg-orange-600 transition duration-300"
+                className="px-5 py-2 rounded-lg bg-primaryColor text-white font-semibold hover:bg-primaryDark transition duration-300"
               >
                 Đăng nhập
               </NavLink>

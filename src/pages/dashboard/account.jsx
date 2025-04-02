@@ -1,35 +1,40 @@
-import React, { useState } from "react";
 import {
+  useCreateUserMutation,
+  useDeleteUserMutation,
+  useGetUserQuery,
+  useUpdateUserMutation,
+} from "@/network/api/authen";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import SearchIcon from "@mui/icons-material/Search";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  Modal,
+  Paper,
+  Switch,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   TextField,
-  Button,
-  Modal,
   Typography,
-  InputAdornment,
-  Box,
-  CircularProgress,
-  Switch,
-  IconButton,
-  MenuItem,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import {
-  useCreateUserMutation,
-  useDeleteUserMutation,
-  useGetUserQuery,
-  useUpdateUserMutation
-} from "@/network/api/authen";
+import Avatar from "antd/es/avatar/Avatar";
+import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Avatar from "antd/es/avatar/Avatar";
 
 const modalStyle = {
   position: "absolute",
@@ -47,6 +52,8 @@ function Accounts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
+  const [selectedAccountId, setSelectedAccountId] = useState(null);
+  const [openConfirm, setOpenConfirm] = useState(false);
   const [newAccount, setNewAccount] = useState({
     name: "",
     email: "",
@@ -64,7 +71,9 @@ function Accounts() {
     return <CircularProgress />;
   }
   if (error) {
-    return <Typography color="error">Lỗi khi tải dữ liệu người dùng!</Typography>;
+    return (
+      <Typography color="error">Lỗi khi tải dữ liệu người dùng!</Typography>
+    );
   }
 
   const handleSearchChange = (e) => {
@@ -74,7 +83,7 @@ function Accounts() {
   const filteredData = data?.filter(
     (account) =>
       account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      account.email.toLowerCase().includes(searchTerm.toLowerCase())
+      account.email.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Hàm thay đổi giá trị của modal (cho cả create và edit)
@@ -116,17 +125,29 @@ function Accounts() {
     }
   };
 
-  // Delete account với xác nhận trước khi xóa
-  const handleDeleteAccount = async (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa tài khoản này?")) {
-      try {
-        await deleteUser(id).unwrap();
-        refetch();
-        toast.success("Xóa tài khoản thành công!");
-      } catch (err) {
-        console.error("Error deleting user:", err);
-        toast.error("Có lỗi xảy ra khi xóa tài khoản.");
-      }
+  // Hàm mở modal xác nhận xoá và lưu id tài khoản
+  const handleOpenConfirm = (id) => {
+    setSelectedAccountId(id);
+    setOpenConfirm(true);
+  };
+
+  // Hàm đóng modal xác nhận xoá
+  const handleCloseConfirm = () => {
+    setOpenConfirm(false);
+    setSelectedAccountId(null);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!selectedAccountId) return;
+
+    try {
+      await deleteUser(selectedAccountId).unwrap();
+      refetch();
+      toast.success("Xóa tài khoản thành công!");
+      handleCloseConfirm(); // Đóng modal sau khi xóa
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      toast.error("Có lỗi xảy ra khi xóa tài khoản.");
     }
   };
 
@@ -168,21 +189,21 @@ function Accounts() {
       height: 40,
       fontSize: "20px", // Make sure the letter is big enough
     };
-    return (
-      <Avatar style={avatarStyle}>
-        {firstLetter}
-      </Avatar>
-
-    );
+    return <Avatar style={avatarStyle}>{firstLetter}</Avatar>;
   };
-
 
   return (
     <div style={{ padding: 10 }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" gutterBottom className="text-primaryColor">
         Tài khoản
       </Typography>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 20,
+        }}
+      >
         <TextField
           variant="outlined"
           placeholder="Tìm kiếm tài khoản..."
@@ -196,7 +217,11 @@ function Accounts() {
             ),
           }}
         />
-        <Button variant="contained" color="primary" onClick={() => setOpenCreateModal(true)}>
+        <Button
+          variant="contained"
+          style={{ backgroundColor: "#0E7490", color: "#ffffff" }}
+          onClick={() => setOpenCreateModal(true)}
+        >
           Thêm tài khoản
         </Button>
       </div>
@@ -225,9 +250,13 @@ function Accounts() {
                   </TableCell>
                   <TableCell>{account.name}</TableCell>
                   <TableCell>{account.email}</TableCell>
-                  <TableCell>{account.role === 'admin' ? 'Quản trị viên' : 'Người dùng'}</TableCell>
                   <TableCell>
-                    {account.joinDate ? new Date(account.joinDate).toLocaleDateString() : "N/A"}
+                    {account.role === "admin" ? "Quản trị viên" : "Người dùng"}
+                  </TableCell>
+                  <TableCell>
+                    {account.joinDate
+                      ? new Date(account.joinDate).toLocaleDateString()
+                      : "N/A"}
                   </TableCell>
                   <TableCell>
                     {account.package === "free" ? "Miễn phí" : "Premium"}
@@ -235,15 +264,22 @@ function Accounts() {
                   <TableCell>
                     <Switch
                       checked={account.isVerified}
-                      onChange={(e) => handleToggleVerified(account._id, e.target.checked)}
+                      onChange={(e) =>
+                        handleToggleVerified(account._id, e.target.checked)
+                      }
                       color="primary"
                     />
                   </TableCell>
                   <TableCell>
                     <IconButton onClick={() => handleEditAccount(account)}>
-                      <EditIcon color="primary" />
+                      <EditIcon style={{ color: "#0E7490" }} />
                     </IconButton>
-                    <IconButton onClick={() => handleDeleteAccount(account._id)}>
+                    {/* <IconButton
+                      onClick={() => handleDeleteAccount(account._id)}
+                    >
+                      <DeleteIcon color="error" />
+                    </IconButton> */}
+                    <IconButton onClick={() => handleOpenConfirm(account._id)}>
                       <DeleteIcon color="error" />
                     </IconButton>
                   </TableCell>
@@ -310,7 +346,11 @@ function Accounts() {
             <Button onClick={() => setOpenCreateModal(false)} sx={{ mr: 1 }}>
               Hủy
             </Button>
-            <Button variant="contained" color="primary" onClick={handleCreateAccount}>
+            <Button
+              variant="contained"
+              style={{ backgroundColor: "#0E7490", color: "#ffffff" }}
+              onClick={handleCreateAccount}
+            >
               Tạo
             </Button>
           </Box>
@@ -330,7 +370,9 @@ function Accounts() {
                 variant="outlined"
                 name="name"
                 value={editingAccount.name}
-                onChange={(e) => handleInputChange(e, setEditingAccount, editingAccount)}
+                onChange={(e) =>
+                  handleInputChange(e, setEditingAccount, editingAccount)
+                }
                 fullWidth
                 margin="normal"
               />
@@ -339,7 +381,9 @@ function Accounts() {
                 variant="outlined"
                 name="email"
                 value={editingAccount.email}
-                onChange={(e) => handleInputChange(e, setEditingAccount, editingAccount)}
+                onChange={(e) =>
+                  handleInputChange(e, setEditingAccount, editingAccount)
+                }
                 fullWidth
                 margin="normal"
               />
@@ -348,7 +392,9 @@ function Accounts() {
                 label="Vai trò"
                 name="role"
                 value={editingAccount.role}
-                onChange={(e) => handleInputChange(e, setEditingAccount, editingAccount)}
+                onChange={(e) =>
+                  handleInputChange(e, setEditingAccount, editingAccount)
+                }
                 fullWidth
                 margin="normal"
               >
@@ -359,7 +405,11 @@ function Accounts() {
                 <Button onClick={() => setOpenEditModal(false)} sx={{ mr: 1 }}>
                   Hủy
                 </Button>
-                <Button variant="contained" color="primary" onClick={handleUpdateAccount}>
+                <Button
+                  variant="contained"
+                  style={{ backgroundColor: "#0E7490", color: "#ffffff" }}
+                  onClick={handleUpdateAccount}
+                >
                   Cập nhật
                 </Button>
               </Box>
@@ -367,7 +417,22 @@ function Accounts() {
           )}
         </Box>
       </Modal>
-
+      <Dialog open={openConfirm} onClose={handleCloseConfirm}>
+        <DialogTitle>Xác nhận xoá</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Bạn có chắc chắn muốn xóa tài khoản này không?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirm} style={{ color: "#0E7490" }}>
+            Hủy
+          </Button>
+          <Button onClick={handleDeleteAccount} color="error">
+            Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );

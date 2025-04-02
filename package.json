@@ -32,6 +32,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "6.17.0",
     "react-toastify": "11.0.3",
+    "recharts": "^2.15.1",
     "recoil": "^0.7.7"
   },
   "devDependencies": {

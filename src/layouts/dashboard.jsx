@@ -1,14 +1,10 @@
-import { Routes, Route } from "react-router-dom";
-import {
-  Sidenav,
-  DashboardNavbar,
-  Footer,
-} from "@/widgets/layout";
-import routes from "@/routes";
 import { useMaterialTailwindController } from "@/context";
+import routes from "@/routes";
+import { DashboardNavbar, Footer, Sidenav } from "@/widgets/layout";
+import { Route, Routes } from "react-router-dom";
 
 export function Dashboard() {
-  const [controller, dispatch] = useMaterialTailwindController();
+  const [controller] = useMaterialTailwindController();
   const { sidenavType } = controller;
 
   return (
@@ -34,7 +30,7 @@ export function Dashboard() {
                 layout === "dashboard" &&
                 pages.map(({ path, element }) => (
                   <Route exact path={path} element={element} />
-                ))
+                )),
             )}
           </Routes>
         </div>

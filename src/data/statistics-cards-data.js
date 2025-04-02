@@ -1,15 +1,15 @@
 import {
   BanknotesIcon,
+  ChartBarIcon,
   UserPlusIcon,
   UsersIcon,
-  ChartBarIcon,
 } from "@heroicons/react/24/solid";
 
 export const statisticsCardsData = [
   {
     color: "gray",
     icon: UsersIcon,
-    title: "Số người dùng tham gia",
+    title: "Số người dùng",
     value: "2,300",
     footer: {
       color: "text-green-500",
@@ -20,7 +20,7 @@ export const statisticsCardsData = [
   {
     color: "gray",
     icon: ChartBarIcon,
-    title: "Tài liệu đã được tải lên",
+    title: "Giao dịch",
     value: "1,452",
     footer: {
       color: "text-green-500",
@@ -31,7 +31,7 @@ export const statisticsCardsData = [
   {
     color: "gray",
     icon: BanknotesIcon,
-    title: "Tài liệu được đánh giá cao",
+    title: "Tài khoản tham gia",
     value: "987",
     footer: {
       color: "text-red-500",
@@ -42,7 +42,18 @@ export const statisticsCardsData = [
   {
     color: "gray",
     icon: UserPlusIcon,
-    title: "Số tài khoản người dùng",
+    title: "Bài tập được tạo",
+    value: "5,678",
+    footer: {
+      color: "text-green-500",
+      value: "+7%",
+      label: "so với tháng trước",
+    },
+  },
+  {
+    color: "gray",
+    icon: UserPlusIcon,
+    title: "Tài liệu được đăng",
     value: "5,678",
     footer: {
       color: "text-green-500",

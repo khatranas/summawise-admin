@@ -1,13 +1,13 @@
 import {
-  HomeIcon,
-  UserGroupIcon,
-  CreditCardIcon,
+  BanknotesIcon,
+  ChartBarIcon,
   CurrencyDollarIcon,
+  UserGroupIcon,
 } from "@heroicons/react/24/solid";
-import { PricingPayment } from "./pages/dashboard/pricingPayment";
 import { Home } from "./pages/dashboard";
 import Accounts from "./pages/dashboard/account";
-import { PaymentAcc } from "./pages/dashboard/paymentAcc";
+import { PricingPayment } from "./pages/dashboard/pricingPayment";
+import { Transactions } from "./pages/dashboard/transactions";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -18,8 +18,8 @@ export const routes = [
     layout: "dashboard",
     pages: [
       {
-        icon: <HomeIcon {...icon} />,
-        name: "Trang chủ",
+        icon: <ChartBarIcon {...icon} />,
+        name: "Thống kê",
         path: "/home",
         element: <Home />,
       },
@@ -30,10 +30,10 @@ export const routes = [
         element: <Accounts />,
       },
       {
-        icon: <CreditCardIcon {...icon} />,
-        name: "Thanh toán",
+        icon: <BanknotesIcon {...icon} />,
+        name: "Giao dịch",
         path: "/payment",
-        element: <PaymentAcc />,
+        element: <Transactions />,
       },
       {
         icon: <CurrencyDollarIcon {...icon} />,

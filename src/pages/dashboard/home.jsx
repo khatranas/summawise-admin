@@ -1,241 +1,205 @@
-import React from "react";
+import { axiosApi } from "@/network/api/api";
 import {
-  Typography,
-  Card,
-  CardHeader,
-  CardBody,
-  IconButton,
-  Menu,
-  MenuHandler,
-  MenuList,
-  MenuItem,
-  Avatar,
+  BanknotesIcon,
+  UserPlusIcon,
+  UsersIcon,
+} from "@heroicons/react/24/solid";
+import { createElement, useEffect, useState } from "react";
+import {
+  Bar,
+  BarChart,
+  ResponsiveContainer,
   Tooltip,
-  Progress,
-} from "@material-tailwind/react";
-import {
-  EllipsisVerticalIcon,
-  ArrowUpIcon,
-} from "@heroicons/react/24/outline";
-import { StatisticsCard } from "@/widgets/cards";
-import { StatisticsChart } from "@/widgets/charts";
-import {
-  statisticsCardsData,
-  statisticsChartsData,
-  projectsTableData,
-  ordersOverviewData,
-} from "@/data";
-import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
+  XAxis,
+  YAxis,
+} from "recharts";
 
 export function Home() {
+  const [filters, setFilters] = useState({
+    search: "",
+    limit: 10,
+    skip: 0,
+    sort: "-createdAt",
+  });
+  const [users, setUsers] = useState([]);
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axiosApi.dashBoardUsers(filters);
+      if (response && Array.isArray(response)) {
+        setUsers(response);
+      }
+    } catch (error) {
+      setUsers([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const premiumUsers =
+    users?.filter((u) => u.package === "premium").length || 0;
+  const freeUsers = users?.length ? users.length - premiumUsers : 0;
+
   return (
-    <div className="mt-12">
-      <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        {statisticsCardsData.map(({ icon, title, footer, ...rest }) => (
-          <StatisticsCard
-            key={title}
-            {...rest}
-            title={title}
-            icon={React.createElement(icon, {
-              className: "w-6 h-6 text-white",
-            })}
-            footer={
-              <Typography className="font-normal text-blue-gray-600">
-                <strong className={footer.color}>{footer.value}</strong>
-                &nbsp;{footer.label}
-              </Typography>
-            }
+    <div className="bg-gray-100 min-h-screen p-8">
+      {/* Bộ lọc */}
+      <div className="flex flex-wrap gap-6 mb-6">
+        {/* Tìm kiếm */}
+        <div className="w-full sm:w-72">
+          <label className="block text-sm font-medium text-primaryColor mb-2">
+            Tìm kiếm
+          </label>
+          <input
+            type="text"
+            name="search"
+            placeholder="Tìm kiếm theo email hoặc tên"
+            value={filters.search}
+            onChange={handleFilterChange}
+            className="p-3 w-full border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-primaryDark"
           />
-        ))}
-      </div>
-      <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
-        {statisticsChartsData.map((props) => (
-          <StatisticsChart
-            key={props.title}
-            {...props}
-            footer={
-              <Typography
-                variant="small"
-                className="flex items-center font-normal text-blue-gray-600"
-              >
-                <ClockIcon strokeWidth={2} className="h-4 w-4 text-blue-gray-400" />
-                &nbsp;{props.footer}
-              </Typography>
-            }
+          <p className="text-xs text-gray-500 mt-1">
+            Tìm kiếm theo tên hoặc email
+          </p>
+        </div>
+
+        {/* Số lượng */}
+        <div className="w-full sm:w-32">
+          <label className="block text-sm font-medium text-primaryColor mb-2">
+            Số lượng
+          </label>
+          <input
+            type="number"
+            name="limit"
+            placeholder="Số lượng"
+            value={filters.limit}
+            onChange={handleFilterChange}
+            className="p-3 w-full border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-primaryDark"
           />
-        ))}
+          <p className="text-xs text-gray-500 mt-1">
+            Số lượng kết quả trên mỗi trang
+          </p>
+        </div>
+
+        {/* Sắp xếp */}
+        <div className="w-full sm:w-48">
+          <label className="block text-sm font-medium text-primaryColor mb-2">
+            Sắp xếp
+          </label>
+          <select
+            name="sort"
+            value={filters.sort}
+            onChange={handleFilterChange}
+            className="p-3 w-full border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-primaryDark"
+          >
+            <option value="-createdAt">Mới nhất</option>
+            <option value="createdAt">Cũ nhất</option>
+            <option value="name">Tên (A-Z)</option>
+            <option value="-name">Tên (Z-A)</option>
+          </select>
+          <p className="text-xs text-gray-500 mt-1">
+            Sắp xếp kết quả (VD: name, -createdAt)
+          </p>
+        </div>
+
+        {/* Nút lọc */}
+        <div className="w-full sm:w-auto mt-8">
+          <button
+            onClick={fetchUsers}
+            className="px-6 py-2 bg-primaryColor text-white rounded-md shadow-md hover:bg-primaryDark transition w-full sm:w-auto"
+          >
+            Lọc
+          </button>
+        </div>
       </div>
-      {/* <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <Card className="overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm">
-          <CardHeader
-            floated={false}
-            shadow={false}
-            color="transparent"
-            className="m-0 flex items-center justify-between p-6"
+
+      {/* Thống kê */}
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <StatisticsCard
+          icon={UsersIcon}
+          title="Tổng người dùng"
+          value={users.length}
+        />
+        <StatisticsCard
+          icon={UserPlusIcon}
+          title="Người dùng VIP"
+          value={premiumUsers}
+        />
+        <StatisticsCard
+          icon={BanknotesIcon}
+          title="Người dùng Free"
+          value={freeUsers}
+        />
+      </div>
+
+      {/* Bảng người dùng */}
+      <div className="mt-8 overflow-x-auto bg-white p-4 rounded-lg shadow-lg">
+        <table className="min-w-full table-auto border-collapse border border-gray-300">
+          <thead className="bg-gray-200">
+            <tr>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                Tên
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                Email
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                Gói
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
+                Ngày tham gia
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user._id} className="hover:bg-gray-50 transition">
+                <td className="px-6 py-4 text-sm text-gray-700">{user.name}</td>
+                <td className="px-6 py-4 text-sm text-gray-700">
+                  {user.email}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-700">
+                  {user.package}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-700">
+                  {new Date(user.joinDate).toLocaleDateString()}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Biểu đồ */}
+      <div className="mt-8 -ml-12 text-primaryColor">
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart
+            data={[
+              { name: "Free", value: freeUsers },
+              { name: "VIP", value: premiumUsers },
+            ]}
           >
-            <div>
-              <Typography variant="h6" color="blue-gray" className="mb-1">
-                Kho tài liệu học tập
-              </Typography>
-              <Typography
-                variant="small"
-                className="flex items-center gap-1 font-normal text-blue-gray-600"
-              >
-                <CheckCircleIcon strokeWidth={3} className="h-4 w-4 text-blue-gray-200" />
-                <strong>30 khoá học đã hoàn thành</strong> trong tháng này
-              </Typography>
-            </div>
-            <Menu placement="left-start">
-              <MenuHandler>
-                <IconButton size="sm" variant="text" color="blue-gray">
-                  <EllipsisVerticalIcon
-                    strokeWidth={3}
-                    fill="currenColor"
-                    className="h-6 w-6"
-                  />
-                </IconButton>
-              </MenuHandler>
-              <MenuList>
-                <MenuItem>Hành động</MenuItem>
-                <MenuItem>Tùy chọn khác</MenuItem>
-                <MenuItem>Khác...</MenuItem>
-              </MenuList>
-            </Menu>
-          </CardHeader>
-
-          <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-            <table className="w-full min-w-[640px] table-auto">
-              <thead>
-                <tr>
-                  {["Khoá học", "Thành viên", "Ngân sách", "Hoàn thành"].map((el) => (
-                    <th
-                      key={el}
-                      className="border-b border-blue-gray-50 py-3 px-6 text-left"
-                    >
-                      <Typography
-                        variant="small"
-                        className="text-[11px] font-medium uppercase text-blue-gray-400"
-                      >
-                        {el}
-                      </Typography>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {projectsTableData.map(({ img, name, members, budget, completion }, key) => {
-                  const className = `py-3 px-5 ${key === projectsTableData.length - 1 ? "" : "border-b border-blue-gray-50"
-                    }`;
-
-                  return (
-                    <tr key={name}>
-                      <td className={className}>
-                        <div className="flex items-center gap-4">
-                          <Avatar src={img} alt={name} size="sm" />
-                          <Typography variant="small" color="blue-gray" className="font-bold">
-                            {name}
-                          </Typography>
-                        </div>
-                      </td>
-                      <td className={className}>
-                        {members.map(({ img, name }, key) => (
-                          <Tooltip key={name} content={name}>
-                            <Avatar
-                              src={img}
-                              alt={name}
-                              size="xs"
-                              variant="circular"
-                              className={`cursor-pointer border-2 border-white ${key === 0 ? "" : "-ml-2.5"
-                                }`}
-                            />
-                          </Tooltip>
-                        ))}
-                      </td>
-                      <td className={className}>
-                        <Typography variant="small" className="text-xs font-medium text-blue-gray-600">
-                          {budget}
-                        </Typography>
-                      </td>
-                      <td className={className}>
-                        <div className="w-10/12">
-                          <Typography variant="small" className="mb-1 block text-xs font-medium text-blue-gray-600">
-                            {completion}%
-                          </Typography>
-                          <Progress
-                            value={completion}
-                            variant="gradient"
-                            color={completion === 100 ? "green" : "blue"}
-                            className="h-1"
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </CardBody>
-
-        </Card> */}
-        {/* <Card className="border border-blue-gray-100 shadow-sm">
-          <CardHeader
-            floated={false}
-            shadow={false}
-            color="transparent"
-            className="m-0 p-6"
-          >
-            <Typography variant="h6" color="blue-gray" className="mb-2">
-              Tổng quan
-            </Typography>
-            <Typography
-              variant="small"
-              className="flex items-center gap-1 font-normal text-blue-gray-600"
-            >
-              <ArrowUpIcon
-                strokeWidth={3}
-                className="h-3.5 w-3.5 text-green-500"
-              />
-              <strong>24%</strong> trong tháng này
-            </Typography>
-          </CardHeader>
-          <CardBody className="pt-0">
-            {ordersOverviewData.map(
-              ({ icon, color, title, description }, key) => (
-                <div key={title} className="flex items-start gap-4 py-3">
-                  <div
-                    className={`relative p-1 after:absolute after:-bottom-6 after:left-2/4 after:w-0.5 after:-translate-x-2/4 after:bg-blue-gray-50 after:content-[''] ${key === ordersOverviewData.length - 1
-                      ? "after:h-0"
-                      : "after:h-4/6"
-                      }`}
-                  >
-                    {React.createElement(icon, {
-                      className: `!w-5 !h-5 ${color}`,
-                    })}
-                  </div>
-                  <div>
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="block font-medium"
-                    >
-                      {title}
-                    </Typography>
-                    <Typography
-                      as="span"
-                      variant="small"
-                      className="text-xs font-medium text-blue-gray-500"
-                    >
-                      {description}
-                    </Typography>
-                  </div>
-                </div>
-              )
-            )}
-          </CardBody>
-        </Card>
-      </div> */}
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="value" fill="currentColor" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
 
-export default Home;
+const StatisticsCard = ({ icon, title, value }) => (
+  <div className="w-full p-6 bg-white shadow rounded-lg flex flex-col items-center text-center">
+    {createElement(icon, { className: "w-8 h-8 text-primaryColor" })}
+    <h3 className="text-xl font-semibold text-gray-700 mt-4">{title}</h3>
+    <p className="text-2xl font-bold text-primaryColor mt-2">{value}</p>
+  </div>
+);
