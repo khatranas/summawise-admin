@@ -1,7 +1,9 @@
 import { axiosApi } from "@/network/api/api";
 import SearchIcon from "@mui/icons-material/Search";
 import {
+  Button,
   InputAdornment,
+  MenuItem,
   Paper,
   Table,
   TableBody,
@@ -19,7 +21,12 @@ import { toast, ToastContainer } from "react-toastify";
 export const Transactions = () => {
   const [paymentAcc, setPaymentAcc] = useState([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [completedOnly, setCompletedOnly] = useState("");
 
   useEffect(() => {
     fetchOrders();
@@ -46,18 +53,41 @@ export const Transactions = () => {
     setPage(0);
   };
 
-  const [searchTerm, setSearchTerm] = useState("");
-
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
-
-  const filteredData = paymentAcc?.filter((paymentAcc) => {
+  const filteredData = paymentAcc?.filter((acc) => {
     const lowerSearchTerm = searchTerm.toLowerCase();
 
+    const matchesSearch =
+      acc.orderId.toLowerCase().includes(lowerSearchTerm) ||
+      acc.userId.toLowerCase().includes(lowerSearchTerm);
+
+    const matchesStatus = !filterStatus || acc.status === filterStatus;
+
+    const matchesCompleted =
+      completedOnly === ""
+        ? true
+        : completedOnly === "yes"
+        ? !!acc.completedAt
+        : !acc.completedAt;
+
+    // So sánh ngày chính xác theo timestamp
+    const createdDate = new Date(acc.createdAt).getTime();
+    const fromTimestamp = fromDate ? new Date(fromDate).getTime() : null;
+    const toTimestamp = toDate
+      ? new Date(toDate + "T23:59:59").getTime()
+      : null;
+
+    const matchesFromDate = fromTimestamp ? createdDate >= fromTimestamp : true;
+    const matchesToDate = toTimestamp ? createdDate <= toTimestamp : true;
+
     return (
-      paymentAcc.orderId.toLowerCase().includes(lowerSearchTerm) ||
-      paymentAcc.userId.toLowerCase().includes(lowerSearchTerm)
+      matchesSearch &&
+      matchesStatus &&
+      matchesCompleted &&
+      matchesFromDate &&
+      matchesToDate
     );
   });
 
@@ -68,8 +98,9 @@ export const Transactions = () => {
       </Typography>
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "16px",
           marginBottom: 20,
           marginTop: 10,
         }}
@@ -87,7 +118,50 @@ export const Transactions = () => {
             ),
           }}
         />
+
+        <TextField
+          select
+          label="Trạng thái"
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+        >
+          <MenuItem value="">Tất cả</MenuItem>
+          <MenuItem value="completed">Hoàn thành</MenuItem>
+          <MenuItem value="pending">Chờ xử lý</MenuItem>
+        </TextField>
+
+        <TextField
+          label="Ngày giao dịch"
+          type="date"
+          value={fromDate}
+          onChange={(e) => setFromDate(e.target.value)}
+          InputLabelProps={{ shrink: true }}
+        />
+
+        <TextField
+          select
+          label="Thời gian hoàn thành"
+          value={completedOnly}
+          onChange={(e) => setCompletedOnly(e.target.value)}
+        >
+          <MenuItem value="">Tất cả</MenuItem>
+          <MenuItem value="yes">Đã hoàn thành</MenuItem>
+          <MenuItem value="no">Chưa hoàn thành</MenuItem>
+        </TextField>
+
+        <Button
+          variant="contained"
+          style={{ backgroundColor: "#0E7490", color: "#ffffff" }}
+          onClick={() => {
+            setFromDate("");
+            setToDate("");
+            setCompletedOnly("");
+          }}
+        >
+          Xoá bộ lọc
+        </Button>
       </div>
+
       <TableContainer component={Paper} elevation={3}>
         <Table>
           <TableHead>
@@ -98,7 +172,7 @@ export const Transactions = () => {
               <TableCell>Trạng thái</TableCell>
               <TableCell>Số tiền</TableCell>
               <TableCell>Ngày giao dịch</TableCell>
-              <TableCell>Trạng thái</TableCell>
+              <TableCell>Thời gian hoàn thành</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -133,36 +207,30 @@ export const Transactions = () => {
                         <span style={{ color: "red" }}>Chưa hoàn thành</span>
                       )}
                     </TableCell>
-                    {/* <TableCell>
-                                        <IconButton onClick={() => console.log("Sửa đơn hàng", order)}>
-                                            <EditIcon color="primary" />
-                                        </IconButton>
-                                        <IconButton onClick={() => console.log("Xóa đơn hàng", order._id)}>
-                                            <DeleteIcon color="error" />
-                                        </IconButton>
-                                    </TableCell> */}
                   </TableRow>
                 ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} align="center">
-                  Không có đơn hàng nào.
+                <TableCell colSpan={7} align="center">
+                  Không có giao dịch nào.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </TableContainer>
+
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={paymentAcc.length}
+        count={filteredData.length}
         rowsPerPage={rowsPerPage}
         page={page}
         labelRowsPerPage="Số dòng mỗi trang"
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
+
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );

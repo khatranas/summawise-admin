@@ -1,66 +1,59 @@
 import { axiosApi } from "@/network/api/api";
 import {
-  BanknotesIcon,
-  UserPlusIcon,
-  UsersIcon,
-} from "@heroicons/react/24/solid";
-import { Typography } from "@material-tailwind/react";
-import { createElement, useEffect, useState } from "react";
+  endOfWeek,
+  isWithinInterval,
+  startOfWeek,
+  subMonths,
+  subWeeks,
+} from "date-fns";
+import {
+  BadgeCheck,
+  Building,
+  CheckCircle,
+  CreditCard,
+  User,
+  UserRoundCheck,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import {
   Bar,
   BarChart,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
-export function Home() {
+const colors = ["#7C3AED", "#06B6D4", "#34D399", "#F59E0B"];
+
+export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
-  const [filters, setFilters] = useState({
+  const [filters] = useState({
     search: "",
     package: "",
     fromDate: "",
     toDate: "",
+    month: "",
+    year: "",
   });
   const [filteredData, setFilteredData] = useState([]);
+  const [paymentAcc, setPaymentAcc] = useState([]);
 
-  // Handle filter change
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // Clear a single filter input
-  const clearFilter = (name) => {
-    setFilters((prev) => ({ ...prev, [name]: "" }));
-  };
-
-  // Apply filters
-  const applyFilters = () => {
-    setFilteredData(
-      users.filter((user) => {
-        const lowerSearch = filters.search.toLowerCase();
-        const userDate = new Date(user.joinDate);
-        const fromDate = filters.fromDate ? new Date(filters.fromDate) : null;
-        const toDate = filters.toDate ? new Date(filters.toDate) : null;
-
-        return (
-          (!filters.search ||
-            user.email.toLowerCase().includes(lowerSearch) ||
-            user.name.toLowerCase().includes(lowerSearch)) &&
-          (!filters.package || user.package === filters.package) &&
-          (!fromDate || userDate >= fromDate) &&
-          (!toDate || userDate <= toDate)
-        );
-      }),
-    );
-  };
+  useEffect(() => {
+    fetchUsers();
+    paymentOrders();
+  }, []);
 
   const fetchUsers = async () => {
     try {
       const response = await axiosApi.dashBoardUsers();
-      if (response && Array.isArray(response)) {
+      if (Array.isArray(response)) {
         setUsers(response);
         setFilteredData(response);
       }
@@ -70,206 +63,290 @@ export function Home() {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  const paymentOrders = async () => {
+    try {
+      const response = await axiosApi.paymentGet();
+      if (Array.isArray(response)) setPaymentAcc(response);
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Lỗi kết nối API.";
+      toast.error(errorMessage);
+    }
+  };
 
-  const premiumUsers =
-    filteredData.filter((u) => u.package === "premium").length || 0;
-  const freeUsers = filteredData.length
-    ? filteredData.length - premiumUsers
-    : 0;
+  const getUserCountByWeek = (users) => {
+    return Array.from({ length: 5 }, (_, i) => {
+      const start = startOfWeek(subWeeks(new Date(), 4 - i), {
+        weekStartsOn: 1,
+      });
+      const end = endOfWeek(subWeeks(new Date(), 4 - i), { weekStartsOn: 1 });
+      const count = users.filter((user) =>
+        isWithinInterval(new Date(user.joinDate), { start, end }),
+      ).length;
+      return { week: `Tuần ${i + 1}`, value: count };
+    });
+  };
+
+  const getFilteredPayments = () => {
+    return paymentAcc.filter((payment) => {
+      const date = new Date(payment.createdAt);
+      const fromDate = filters.fromDate ? new Date(filters.fromDate) : null;
+      const toDate = filters.toDate ? new Date(filters.toDate) : null;
+      const matchMonth = filters.month
+        ? date.getMonth() + 1 === +filters.month
+        : true;
+      const matchYear = filters.year
+        ? date.getFullYear() === +filters.year
+        : true;
+      return (
+        (!fromDate || date >= fromDate) &&
+        (!toDate || date <= toDate) &&
+        matchMonth &&
+        matchYear
+      );
+    });
+  };
+
+  const completedRevenue = getFilteredPayments()
+    .filter((o) => o.status === "completed")
+    .reduce((sum, o) => sum + o.amount, 0);
+
+  const formattedRevenue = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(completedRevenue);
+
+  const getRevenueByMonth = () => {
+    const now = new Date();
+    const data = {};
+    const keys = Array.from({ length: 5 }, (_, i) => {
+      const d = subMonths(now, 4 - i);
+      const k = `${d.getFullYear()}-${d.getMonth() + 1}`;
+      data[k] = 0;
+      return k;
+    });
+    paymentAcc
+      .filter((o) => o.status === "completed")
+      .forEach((o) => {
+        const d = new Date(o.createdAt);
+        const k = `${d.getFullYear()}-${d.getMonth() + 1}`;
+        if (data[k] !== undefined) data[k] += o.amount;
+      });
+    return keys.map((k) => ({
+      month: `Tháng ${k.split("-")[1]}`,
+      value: data[k],
+    }));
+  };
+
+  const getCompletedTransactionsByDayInMonth = () => {
+    const lastMonth = subMonths(new Date(), 1);
+    const days = new Date(
+      lastMonth.getFullYear(),
+      lastMonth.getMonth() + 1,
+      0,
+    ).getDate();
+    const dailyData = Array.from({ length: days }, (_, i) => ({
+      day: i + 1,
+      value: 0,
+    }));
+
+    paymentAcc
+      .filter((o) => o.status === "completed")
+      .forEach((o) => {
+        const d = new Date(o.createdAt);
+        if (
+          d.getMonth() === lastMonth.getMonth() &&
+          d.getFullYear() === lastMonth.getFullYear()
+        ) {
+          dailyData[d.getDate() - 1].value++;
+        }
+      });
+    return dailyData;
+  };
+
+  const usersByWeek = getUserCountByWeek(users);
+  const revenueByMonth = getRevenueByMonth();
+  const completedTransactionsByDay = getCompletedTransactionsByDayInMonth();
+
+  const premiumUsers = filteredData.filter(
+    (u) => u.package === "premium",
+  ).length;
+  const freeUsers = filteredData.length - premiumUsers;
+
+  const StatCard = ({ title, value, icon }) => (
+    <div className="flex flex-col justify-between items-start p-6 bg-white/80 backdrop-blur-md rounded-3xl shadow-lg hover:shadow-xl transition-transform hover:-translate-y-1 duration-300 h-full border border-gray-200">
+      <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-tr from-violet-500 to-fuchsia-500 text-primaryColor mb-4">
+        {icon}
+      </div>
+      <h3 className="text-6xl font-extrabold text-gray-800 break-words max-w-full">
+        {value}
+      </h3>
+      <p className="text-sm font-medium text-gray-500 mt-2">{title}</p>
+    </div>
+  );
 
   return (
-    <div className="bg-gray-100 min-h-screen">
-      <Typography variant="h4" gutterBottom className="text-primaryColor mb-10">
-        Thống kê người dùng
-      </Typography>
-      {/* Bộ lọc */}
-      <div className="flex flex-wrap gap-6 mb-6">
-        {/* Tìm kiếm */}
-        <div className="w-full sm:w-72">
-          <label className="block text-sm font-medium text-primaryColor mb-2">
-            Tìm kiếm
-          </label>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              name="search"
-              placeholder="Tìm kiếm theo email hoặc tên"
-              value={filters.search}
-              onChange={handleFilterChange}
-              className="p-3 w-full border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-primaryDark"
-            />
-            <button
-              onClick={() => clearFilter("search")}
-              className="text-gray-400"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-
-        {/* Gói */}
-        <div className="w-full sm:w-48">
-          <label className="block text-sm font-medium text-primaryColor mb-2">
-            Gói
-          </label>
-          <div className="flex items-center gap-2">
-            <select
-              name="package"
-              value={filters.package}
-              onChange={handleFilterChange}
-              className="p-3 w-full border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-primaryDark"
-            >
-              <option value="">Tất cả</option>
-              <option value="premium">VIP</option>
-              <option value="free">Free</option>
-            </select>
-            <button
-              onClick={() => clearFilter("package")}
-              className="text-gray-400"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-
-        {/* Ngày tham gia */}
-        <div className="w-full sm:w-48">
-          <label className="block text-sm font-medium text-primaryColor mb-2">
-            Từ ngày
-          </label>
-          <div className="flex items-center gap-2">
-            <input
-              type="date"
-              name="fromDate"
-              value={filters.fromDate}
-              onChange={handleFilterChange}
-              className="p-3 w-full border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-primaryDark"
-            />
-            <button
-              onClick={() => clearFilter("fromDate")}
-              className="text-gray-400"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-        <div className="w-full sm:w-48">
-          <label className="block text-sm font-medium text-primaryColor mb-2">
-            Đến ngày
-          </label>
-          <div className="flex items-center gap-2">
-            <input
-              type="date"
-              name="toDate"
-              value={filters.toDate}
-              onChange={handleFilterChange}
-              className="p-3 w-full border rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-primaryDark"
-            />
-            <button
-              onClick={() => clearFilter("toDate")}
-              className="text-gray-400"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-
-        {/* Nút lọc */}
-        <div className="w-full sm:w-auto mt-8">
-          <button
-            onClick={applyFilters}
-            className="px-6 py-2 bg-primaryColor text-white rounded-md shadow-md hover:bg-primaryDark transition w-full sm:w-auto"
-          >
-            Lọc
-          </button>
-        </div>
+    <div className="p-6">
+      <div className="bg-gradient-to-r from-primaryColor to-indigo-600 text-white p-8 rounded-3xl mb-12 shadow-xl text-center">
+        <h1 className="text-4xl md:text-5xl font-extrabold mb-2">
+          📊 Thống kê dữ liệu
+        </h1>
+        <p className="text-sm md:text-base opacity-90">
+          Theo dõi hiệu suất hệ thống và hoạt động người dùng trong thời gian
+          thực
+        </p>
       </div>
 
-      {/* Thống kê */}
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <StatisticsCard
-          icon={UsersIcon}
-          title="Tổng người dùng"
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 max-w-[1280px] mx-auto">
+        <StatCard
+          title="Số lượng Tài khoản"
           value={users.length}
+          icon={<UserRoundCheck className="w-12 h-12" />}
         />
-        <StatisticsCard
-          icon={UserPlusIcon}
-          title="Người dùng VIP"
-          value={premiumUsers}
-        />
-        <StatisticsCard
-          icon={BanknotesIcon}
-          title="Người dùng Free"
+        <StatCard
+          title="Tài khoản Free"
           value={freeUsers}
+          icon={<User className="w-12 h-12" />}
+        />
+        <StatCard
+          title="Tài khoản VIP"
+          value={premiumUsers}
+          icon={<BadgeCheck className="w-12 h-12" />}
+        />
+        <StatCard
+          title="Tài khoản doanh nghiệp"
+          value="0"
+          icon={<Building className="w-12 h-12" />}
+        />
+        <StatCard
+          title="Doanh thu giao dịch"
+          value={formattedRevenue}
+          icon={<CreditCard className="w-12 h-12" />}
+        />
+        <StatCard
+          title="Giao dịch hoàn thành"
+          value={
+            getFilteredPayments().filter((tx) => tx.status === "completed")
+              .length
+          }
+          icon={<CheckCircle className="w-12 h-12" />}
         />
       </div>
 
-      {/* Bảng người dùng */}
-      <div className="mt-8 overflow-x-auto bg-white p-4 rounded-lg shadow-lg">
-        <table className="min-w-full table-auto border-collapse border border-gray-300">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                Tên
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                Email
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                Gói
-              </th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-600">
-                Ngày tham gia
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.map((user) => (
-              <tr key={user._id} className="hover:bg-gray-50 transition">
-                <td className="px-6 py-4 text-sm text-gray-700">{user.name}</td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  {user.email}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  {user.package === "premium" ? "Vip" : user.package}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  {new Date(user.joinDate).toLocaleDateString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <div className="space-y-12 max-w-[1280px] mx-auto">
+        <DashboardCard title="📈 Số tài khoản tạo trong 5 tuần gần đây">
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={usersByWeek}>
+              <XAxis dataKey="week" />
+              <YAxis />
+              <Tooltip />
+              <Bar
+                dataKey="value"
+                fill="#7C3AED"
+                radius={[8, 8, 0, 0]}
+                barSize={40}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </DashboardCard>
 
-      {/* Biểu đồ */}
-      <div className="mt-8 -ml-12 text-primaryColor">
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart
-            data={[
-              { name: "Free", value: freeUsers },
-              { name: "VIP", value: premiumUsers },
-            ]}
-          >
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="value" fill="currentColor" />
-          </BarChart>
-        </ResponsiveContainer>
+        <DashboardCard title="📄 Tài liệu tạo ra trong 5 tuần gần đây">
+          <ResponsiveContainer width="100%" height={500}>
+            <LineChart
+              data={[
+                { week: "Tuần 1", value: 80 },
+                { week: "Tuần 2", value: 160 },
+                { week: "Tuần 3", value: 120 },
+                { week: "Tuần 4", value: 200 },
+                { week: "Tuần 5", value: 240 },
+              ]}
+            >
+              <XAxis dataKey="week" />
+              <YAxis />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#06B6D4"
+                strokeWidth={3}
+                dot={{ r: 4 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </DashboardCard>
+
+        <DashboardCard title="📊 Tài liệu theo loại">
+          <ResponsiveContainer width="100%" height={500}>
+            <PieChart>
+              <Pie
+                data={[
+                  { name: "Văn bản", value: 120 },
+                  { name: "File", value: 80 },
+                  { name: "Hình ảnh", value: 50 },
+                  { name: "Video", value: 30 },
+                ]}
+                dataKey="value"
+                nameKey="name"
+                outerRadius={200}
+                fill="#8884d8"
+                label
+              >
+                {colors.map((color, index) => (
+                  <Cell key={`cell-${index}`} fill={color} />
+                ))}
+              </Pie>
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </DashboardCard>
+
+        <DashboardCard title="✅ Giao dịch hoàn thành theo ngày trong tháng">
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={completedTransactionsByDay}>
+              <XAxis dataKey="day" />
+              <YAxis />
+              <Tooltip />
+              <Bar
+                dataKey="value"
+                fill="#34D399"
+                radius={[8, 8, 0, 0]}
+                barSize={40}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </DashboardCard>
+
+        <DashboardCard title="💰 Tổng doanh thu 5 tháng gần đây">
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart
+              data={revenueByMonth}
+              margin={{ top: 20, right: 20, bottom: 20, left: 40 }}
+            >
+              <XAxis dataKey="month" />
+              <YAxis
+                domain={[0, "dataMax + 1000000"]}
+                tickCount={8}
+                tickFormatter={(v) => `${v.toLocaleString()}₫`}
+              />
+              <Tooltip formatter={(v) => `${v.toLocaleString()}₫`} />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#F59E0B"
+                strokeWidth={3}
+                dot
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </DashboardCard>
       </div>
     </div>
   );
 }
-
-// StatisticsCard component
-const StatisticsCard = ({ icon, title, value }) => (
-  <div className="w-full p-6 bg-white shadow rounded-lg flex flex-col items-center text-center">
-    {createElement(icon, { className: "w-8 h-8 text-primaryColor" })}
-    <h3 className="text-xl font-semibold text-gray-700 mt-4">{title}</h3>
-    <p className="text-2xl font-bold text-primaryColor mt-2">{value}</p>
-  </div>
-);
+function DashboardCard({ title, children }) {
+  return (
+    <div className="bg-white p-6 rounded-3xl shadow-md border border-gray-100">
+      <h3 className="text-xl font-semibold text-gray-800 mb-5">{title}</h3>
+      {children}
+    </div>
+  );
+}

@@ -27,6 +27,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   TextField,
   Typography,
@@ -50,6 +51,14 @@ const modalStyle = {
 
 function Accounts() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterVerified, setFilterVerified] = useState("");
+  const [filterDay, setFilterDay] = useState("");
+  const [filterMonth, setFilterMonth] = useState("");
+  const [filterYear, setFilterYear] = useState("");
+  const [filterPackage, setFilterPackage] = useState("");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedAccountId, setSelectedAccountId] = useState(null);
@@ -76,15 +85,14 @@ function Accounts() {
     );
   }
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+  const handleChangePage = (_event, newPage) => {
+    setPage(newPage);
   };
 
-  const filteredData = data?.filter(
-    (account) =>
-      account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      account.email.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   // Hàm thay đổi giá trị của modal (cho cả create và edit)
   const handleInputChange = (e, setState, state) => {
@@ -177,20 +185,50 @@ function Accounts() {
   };
 
   const CustomAvatar = ({ name }) => {
-    const displayName = name || "U"; // Default to 'U' if no name is provided
-    const firstLetter = displayName.charAt(0).toUpperCase(); // Get the first letter of the name
-    const bgColor = stringToColor(displayName); // Generate the background color from the name
-
-    // Using inline styles for better control of background color
+    const displayName = name || "U";
+    const firstLetter = displayName.charAt(0).toUpperCase();
+    const bgColor = stringToColor(displayName);
     const avatarStyle = {
       backgroundColor: bgColor,
-      color: "#fff", // Ensure the text is visible (white color)
+      color: "#fff",
       width: 40,
       height: 40,
-      fontSize: "20px", // Make sure the letter is big enough
+      fontSize: "20px",
     };
     return <Avatar style={avatarStyle}>{firstLetter}</Avatar>;
   };
+
+  const filteredData = data?.filter((account) => {
+    const matchNameOrEmail =
+      account.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      account.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesPackage =
+      filterPackage === "" || account.package === filterPackage;
+
+    const matchVerified =
+      filterVerified === ""
+        ? true
+        : String(account.isVerified) === filterVerified;
+
+    const joinDate = account.joinDate ? new Date(account.joinDate) : null;
+
+    const matchDay = filterDay ? joinDate?.getDate() === +filterDay : true;
+    const matchMonth = filterMonth
+      ? joinDate?.getMonth() + 1 === +filterMonth
+      : true;
+    const matchYear = filterYear
+      ? joinDate?.getFullYear() === +filterYear
+      : true;
+
+    return (
+      matchNameOrEmail &&
+      matchVerified &&
+      matchDay &&
+      matchMonth &&
+      matchYear &&
+      matchesPackage
+    );
+  });
 
   return (
     <div style={{ padding: 10 }}>
@@ -198,17 +236,13 @@ function Accounts() {
         Tài khoản
       </Typography>
       <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: 20,
-        }}
+        style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }}
       >
         <TextField
           variant="outlined"
-          placeholder="Tìm kiếm tài khoản..."
+          label="Tìm kiếm tên tài khoản/ email"
           value={searchTerm}
-          onChange={handleSearchChange}
+          onChange={(e) => setSearchTerm(e.target.value)}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -217,6 +251,65 @@ function Accounts() {
             ),
           }}
         />
+        <TextField
+          label="Xác thực"
+          select
+          value={filterVerified}
+          onChange={(e) => setFilterVerified(e.target.value)}
+          style={{ minWidth: 140 }}
+        >
+          <MenuItem value="">Tất cả</MenuItem>
+          <MenuItem value="true">Đã xác thực</MenuItem>
+          <MenuItem value="false">Chưa xác thực</MenuItem>
+        </TextField>
+        <TextField
+          label="Gói sử dụng"
+          select
+          value={filterPackage}
+          onChange={(e) => setFilterPackage(e.target.value)}
+          style={{ minWidth: 140 }}
+        >
+          <MenuItem value="">Tất cả</MenuItem>
+          <MenuItem value="free">Free</MenuItem>
+          <MenuItem value="premium">VIP</MenuItem>
+        </TextField>
+        <TextField
+          label="Ngày"
+          type="number"
+          value={filterDay}
+          onChange={(e) => setFilterDay(e.target.value)}
+          inputProps={{ min: 1, max: 31 }}
+          style={{ width: 100 }}
+        />
+        <TextField
+          label="Tháng"
+          type="number"
+          value={filterMonth}
+          onChange={(e) => setFilterMonth(e.target.value)}
+          inputProps={{ min: 1, max: 12 }}
+          style={{ width: 100 }}
+        />
+        <TextField
+          label="Năm"
+          type="number"
+          value={filterYear}
+          onChange={(e) => setFilterYear(e.target.value)}
+          style={{ width: 120 }}
+        />
+        <Button
+          variant="contained"
+          style={{ backgroundColor: "#0E7490", color: "#ffffff" }}
+          onClick={() => {
+            setSearchTerm("");
+            setFilterVerified("");
+            setFilterDay("");
+            setFilterMonth("");
+            setFilterYear("");
+            setFilterPackage("");
+          }}
+        >
+          Xoá bộ lọc
+        </Button>
         <Button
           variant="contained"
           style={{ backgroundColor: "#0E7490", color: "#ffffff" }}
@@ -231,7 +324,7 @@ function Accounts() {
             <TableRow style={{ backgroundColor: "#f5f5f5" }}>
               <TableCell>STT</TableCell>
               <TableCell>Ảnh đại diện</TableCell>
-              <TableCell>Tên người dùng</TableCell>
+              <TableCell>Tên tài khoản</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Vai trò</TableCell>
               <TableCell>Ngày tham gia</TableCell>
@@ -242,49 +335,55 @@ function Accounts() {
           </TableHead>
           <TableBody>
             {filteredData && filteredData.length > 0 ? (
-              filteredData.map((account, index) => (
-                <TableRow key={account._id} hover>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>
-                    <CustomAvatar name={account?.name} />
-                  </TableCell>
-                  <TableCell>{account.name}</TableCell>
-                  <TableCell>{account.email}</TableCell>
-                  <TableCell>
-                    {account.role === "admin" ? "Quản trị viên" : "Người dùng"}
-                  </TableCell>
-                  <TableCell>
-                    {account.joinDate
-                      ? new Date(account.joinDate).toLocaleDateString()
-                      : "N/A"}
-                  </TableCell>
-                  <TableCell>
-                    {account.package === "free" ? "Miễn phí" : "Premium"}
-                  </TableCell>
-                  <TableCell>
-                    <Switch
-                      checked={account.isVerified}
-                      onChange={(e) =>
-                        handleToggleVerified(account._id, e.target.checked)
-                      }
-                      color="primary"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <IconButton onClick={() => handleEditAccount(account)}>
-                      <EditIcon style={{ color: "#0E7490" }} />
-                    </IconButton>
-                    {/* <IconButton
+              filteredData
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((account, index) => (
+                  <TableRow key={account._id} hover>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>
+                      <CustomAvatar name={account?.name} />
+                    </TableCell>
+                    <TableCell>{account.name}</TableCell>
+                    <TableCell>{account.email}</TableCell>
+                    <TableCell>
+                      {account.role === "admin"
+                        ? "Người dùng"
+                        : "Quản trị viên"}
+                    </TableCell>
+                    <TableCell>
+                      {account.joinDate
+                        ? new Date(account.joinDate).toLocaleDateString()
+                        : "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {account.package === "premium" ? "VIP" : "Free"}
+                    </TableCell>
+                    <TableCell>
+                      <Switch
+                        checked={account.isVerified}
+                        onChange={(e) =>
+                          handleToggleVerified(account._id, e.target.checked)
+                        }
+                        color="primary"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <IconButton onClick={() => handleEditAccount(account)}>
+                        <EditIcon style={{ color: "#0E7490" }} />
+                      </IconButton>
+                      {/* <IconButton
                       onClick={() => handleDeleteAccount(account._id)}
                     >
                       <DeleteIcon color="error" />
                     </IconButton> */}
-                    <IconButton onClick={() => handleOpenConfirm(account._id)}>
-                      <DeleteIcon color="error" />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
+                      <IconButton
+                        onClick={() => handleOpenConfirm(account._id)}
+                      >
+                        <DeleteIcon color="error" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))
             ) : (
               <TableRow>
                 <TableCell colSpan={9} align="center">
@@ -433,6 +532,16 @@ function Accounts() {
           </Button>
         </DialogActions>
       </Dialog>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={filteredData.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        labelRowsPerPage="Số dòng mỗi trang"
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
