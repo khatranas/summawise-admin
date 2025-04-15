@@ -24,7 +24,6 @@ export const Transactions = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-  const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [completedOnly, setCompletedOnly] = useState("");
 
@@ -74,27 +73,23 @@ export const Transactions = () => {
 
     // So sánh ngày chính xác theo timestamp
     const createdDate = new Date(acc.createdAt).getTime();
-    const fromTimestamp = fromDate ? new Date(fromDate).getTime() : null;
     const toTimestamp = toDate
       ? new Date(toDate + "T23:59:59").getTime()
       : null;
 
-    const matchesFromDate = fromTimestamp ? createdDate >= fromTimestamp : true;
     const matchesToDate = toTimestamp ? createdDate <= toTimestamp : true;
 
-    return (
-      matchesSearch &&
-      matchesStatus &&
-      matchesCompleted &&
-      matchesFromDate &&
-      matchesToDate
-    );
+    return matchesSearch && matchesStatus && matchesCompleted && matchesToDate;
   });
 
   return (
     <div style={{ padding: 20 }}>
-      <Typography variant="h4" gutterBottom className="text-primaryColor">
-        Giao dịch
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ fontWeight: 600, color: "#0E7490" }}
+      >
+        Giao dịch{" "}
       </Typography>
       <div
         style={{
@@ -131,14 +126,6 @@ export const Transactions = () => {
         </TextField>
 
         <TextField
-          label="Ngày giao dịch"
-          type="date"
-          value={fromDate}
-          onChange={(e) => setFromDate(e.target.value)}
-          InputLabelProps={{ shrink: true }}
-        />
-
-        <TextField
           select
           label="Thời gian hoàn thành"
           value={completedOnly}
@@ -153,7 +140,6 @@ export const Transactions = () => {
           variant="contained"
           style={{ backgroundColor: "#0E7490", color: "#ffffff" }}
           onClick={() => {
-            setFromDate("");
             setToDate("");
             setCompletedOnly("");
           }}

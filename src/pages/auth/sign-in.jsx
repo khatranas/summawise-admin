@@ -1,34 +1,38 @@
+import { useLoginUserMutation } from "@/network/api/authen";
 import { Button, Input, Typography } from "antd";
-import { useForm, Controller } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import Background from "../../assets/imgs/background_login.png";
-import React from "react";
-import { axiosApi } from "@/network/api/api";
 import { toast } from "react-toastify";
-import Cookies from "js-cookie";
+import Background from "../../assets/imgs/background_login.png";
 
 export function SignIn() {
   const navigate = useNavigate();
-
+  const [Login] = useLoginUserMutation();
   const {
     control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm({
     defaultValues: {
       email: "",
-      password: ""
-    }
+      password: "",
+    },
   });
 
   // Xử lý sự kiện submit form
   const onSubmit = async (data) => {
     try {
-      const response = await axiosApi.login({
+      let payload = {
         email: data.email,
-        password: data.password
-      });
-      Cookies.set("accessToken", response.data.access_token, { path: "/" });
+        password: data.password,
+      };
+      const response = await Login(payload);
+      console.log("response", response);
+      // const response = await axiosApi.login({
+      //   email: data.email,
+      //   password: data.password
+      // });
+      // Cookies.set("accessToken", response.data.access_token, { path: "/" });
       toast.success("Đăng nhập thành công");
       navigate("/");
     } catch (error) {
@@ -40,13 +44,19 @@ export function SignIn() {
   return (
     <div className="w-full h-screen flex items-center justify-center relative">
       <div className="absolute inset-0">
-        <img src={Background} className="h-full w-full object-cover" alt="Background" />
+        <img
+          src={Background}
+          className="h-full w-full object-cover"
+          alt="Background"
+        />
         <div className="absolute inset-0 bg-white bg-opacity-20"></div>
       </div>
 
       <div className="relative w-full max-w-xl p-28 bg-white rounded-xl shadow-lg ">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <h1 className="text-[40px] font-semibold text-gray-800 text-center">Đăng nhập</h1>
+          <h1 className="text-[40px] font-semibold text-gray-800 text-center">
+            Đăng nhập
+          </h1>
           <div>
             <Typography.Text>Email</Typography.Text>
             <Controller
@@ -56,8 +66,8 @@ export function SignIn() {
                 required: "Vui lòng nhập email",
                 pattern: {
                   value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Email không hợp lệ"
-                }
+                  message: "Email không hợp lệ",
+                },
               }}
               render={({ field }) => (
                 <Input
@@ -70,7 +80,9 @@ export function SignIn() {
               )}
             />
             {errors.email && (
-              <Typography.Text type="danger">{errors.email.message}</Typography.Text>
+              <Typography.Text type="danger">
+                {errors.email.message}
+              </Typography.Text>
             )}
           </div>
           <div>
@@ -89,7 +101,9 @@ export function SignIn() {
               )}
             />
             {errors.password && (
-              <Typography.Text type="danger">{errors.password.message}</Typography.Text>
+              <Typography.Text type="danger">
+                {errors.password.message}
+              </Typography.Text>
             )}
           </div>
           <Button
@@ -106,7 +120,6 @@ export function SignIn() {
         </form>
       </div>
     </div>
-
   );
 }
 

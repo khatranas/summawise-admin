@@ -30,7 +30,7 @@ import {
   YAxis,
 } from "recharts";
 
-const colors = ["#7C3AED", "#06B6D4", "#34D399", "#F59E0B"];
+const colors = ["#6366F1", "#EC4899", "#F59E0B", "#10B981"];
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -111,7 +111,7 @@ export default function AdminDashboard() {
     .reduce((sum, o) => sum + o.amount, 0);
 
   const formattedRevenue = new Intl.NumberFormat("vi-VN", {
-    style: "currency",
+    // style: "currency",
     currency: "VND",
   }).format(completedRevenue);
 
@@ -171,24 +171,29 @@ export default function AdminDashboard() {
     (u) => u.package === "premium",
   ).length;
   const freeUsers = filteredData.length - premiumUsers;
-
-  const StatCard = ({ title, value, icon }) => (
-    <div className="flex flex-col justify-between items-start p-6 bg-white/80 backdrop-blur-md rounded-3xl shadow-lg hover:shadow-xl transition-transform hover:-translate-y-1 duration-300 h-full border border-gray-200">
-      <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-tr from-violet-500 to-fuchsia-500 text-primaryColor mb-4">
+  const StatCard = ({ title, value, icon, bgColor }) => (
+    <div
+      className={`flex justify-between items-center p-6 ${bgColor} 
+        backdrop-blur-md rounded-2xl shadow-lg hover:shadow-xl 
+        transition-transform hover:-translate-y-1 duration-300 h-full border border-gray-200`}
+    >
+      <div className="flex flex-col justify-center">
+        <h3 className="text-5xl font-extrabold text-primaryColor break-words max-w-full">
+          {value}
+        </h3>
+        <p className="text-sm font-medium text-blue-gray-600 mt-4">{title}</p>
+      </div>
+      <div className="flex items-center justify-center w-20 h-20 rounded-full bg-white text-blue-gray-600 ml-2 shrink-0">
         {icon}
       </div>
-      <h3 className="text-6xl font-extrabold text-gray-800 break-words max-w-full">
-        {value}
-      </h3>
-      <p className="text-sm font-medium text-gray-500 mt-2">{title}</p>
     </div>
   );
 
   return (
-    <div className="p-6">
-      <div className="bg-gradient-to-r from-primaryColor to-indigo-600 text-white p-8 rounded-3xl mb-12 shadow-xl text-center">
+    <div className="">
+      <div className="bg-gradient-to-r from-primaryColor to-primaryDark text-white p-8 rounded-t-2xl mb-12 shadow-xl text-center">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-2">
-          📊 Thống kê dữ liệu
+          Thống kê chung
         </h1>
         <p className="text-sm md:text-base opacity-90">
           Theo dõi hiệu suất hệ thống và hoạt động người dùng trong thời gian
@@ -196,31 +201,36 @@ export default function AdminDashboard() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 max-w-[1280px] mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8 max-w-[1280px] mx-auto">
         <StatCard
           title="Số lượng Tài khoản"
           value={users.length}
           icon={<UserRoundCheck className="w-12 h-12" />}
+          bgColor="bg-gradient-to-tr from-indigo-100 to-indigo-200"
         />
         <StatCard
           title="Tài khoản Free"
           value={freeUsers}
           icon={<User className="w-12 h-12" />}
+          bgColor="bg-gradient-to-tr from-green-100 to-green-200"
         />
         <StatCard
           title="Tài khoản VIP"
           value={premiumUsers}
           icon={<BadgeCheck className="w-12 h-12" />}
+          bgColor="bg-gradient-to-tr from-yellow-100 to-yellow-200"
         />
         <StatCard
           title="Tài khoản doanh nghiệp"
           value="0"
           icon={<Building className="w-12 h-12" />}
+          bgColor="bg-gradient-to-tr from-orange-100 to-orange-200"
         />
         <StatCard
           title="Doanh thu giao dịch"
           value={formattedRevenue}
           icon={<CreditCard className="w-12 h-12" />}
+          bgColor="bg-gradient-to-tr from-pink-100 to-pink-200"
         />
         <StatCard
           title="Giao dịch hoàn thành"
@@ -229,11 +239,12 @@ export default function AdminDashboard() {
               .length
           }
           icon={<CheckCircle className="w-12 h-12" />}
+          bgColor="bg-gradient-to-tr from-red-100 to-red-200"
         />
       </div>
 
-      <div className="space-y-12 max-w-[1280px] mx-auto">
-        <DashboardCard title="📈 Số tài khoản tạo trong 5 tuần gần đây">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1280px] mx-auto">
+        <DashboardCard title="📊 Số tài khoản tạo trong 5 tuần gần đây">
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={usersByWeek}>
               <XAxis dataKey="week" />
@@ -250,7 +261,7 @@ export default function AdminDashboard() {
         </DashboardCard>
 
         <DashboardCard title="📄 Tài liệu tạo ra trong 5 tuần gần đây">
-          <ResponsiveContainer width="100%" height={500}>
+          <ResponsiveContainer width="100%" height={400}>
             <LineChart
               data={[
                 { week: "Tuần 1", value: 80 },
@@ -274,8 +285,8 @@ export default function AdminDashboard() {
           </ResponsiveContainer>
         </DashboardCard>
 
-        <DashboardCard title="📊 Tài liệu theo loại">
-          <ResponsiveContainer width="100%" height={500}>
+        <DashboardCard title="🎨 Tài liệu theo loại">
+          <ResponsiveContainer width="100%" height={400}>
             <PieChart>
               <Pie
                 data={[
@@ -286,15 +297,30 @@ export default function AdminDashboard() {
                 ]}
                 dataKey="value"
                 nameKey="name"
-                outerRadius={200}
-                fill="#8884d8"
-                label
+                cx="50%"
+                cy="50%"
+                innerRadius={70}
+                outerRadius={120}
+                paddingAngle={3}
+                label={({ name, percent }) =>
+                  `${name}: ${(percent * 100).toFixed(0)}%`
+                }
+                labelLine={false}
               >
                 {colors.map((color, index) => (
                   <Cell key={`cell-${index}`} fill={color} />
                 ))}
               </Pie>
-              <Legend />
+              <Legend
+                iconType="circle"
+                layout="vertical"
+                align="right"
+                verticalAlign="middle"
+                wrapperStyle={{
+                  fontSize: 14,
+                  fontWeight: 500,
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </DashboardCard>
@@ -314,7 +340,8 @@ export default function AdminDashboard() {
             </BarChart>
           </ResponsiveContainer>
         </DashboardCard>
-
+      </div>
+      <div className="mt-8">
         <DashboardCard title="💰 Tổng doanh thu 5 tháng gần đây">
           <ResponsiveContainer width="100%" height={400}>
             <LineChart
@@ -344,7 +371,7 @@ export default function AdminDashboard() {
 }
 function DashboardCard({ title, children }) {
   return (
-    <div className="bg-white p-6 rounded-3xl shadow-md border border-gray-100">
+    <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
       <h3 className="text-xl font-semibold text-gray-800 mb-5">{title}</h3>
       {children}
     </div>

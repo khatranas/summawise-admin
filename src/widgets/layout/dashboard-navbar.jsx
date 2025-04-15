@@ -32,10 +32,10 @@ export function DashboardNavbar() {
 
   const name = data?.name || "U";
   const firstLetter = name.charAt(0).toUpperCase();
-  const vietnameseLayout = layout === "dashboard" ? "Bảng điều khiển" : layout;
+  const vietnameseLayout = layout === "dashboard" ? "Trang chủ" : layout;
   const vietnamesePage =
     page === "home"
-      ? "Trang chủ"
+      ? "Bảng điều khiển"
       : page === "account"
       ? "Tài khoản"
       : page === "payment"

@@ -109,7 +109,11 @@ function AccountUsers() {
 
   return (
     <div style={{ padding: 10 }}>
-      <Typography variant="h4" gutterBottom className="text-primaryColor">
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ fontWeight: 600, color: "#0E7490" }}
+      >
         Người dùng
       </Typography>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

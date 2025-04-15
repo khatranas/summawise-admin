@@ -52,9 +52,7 @@ const modalStyle = {
 function Accounts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterVerified, setFilterVerified] = useState("");
-  const [filterDay, setFilterDay] = useState("");
-  const [filterMonth, setFilterMonth] = useState("");
-  const [filterYear, setFilterYear] = useState("");
+
   const [filterPackage, setFilterPackage] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -210,30 +208,17 @@ function Accounts() {
         ? true
         : String(account.isVerified) === filterVerified;
 
-    const joinDate = account.joinDate ? new Date(account.joinDate) : null;
-
-    const matchDay = filterDay ? joinDate?.getDate() === +filterDay : true;
-    const matchMonth = filterMonth
-      ? joinDate?.getMonth() + 1 === +filterMonth
-      : true;
-    const matchYear = filterYear
-      ? joinDate?.getFullYear() === +filterYear
-      : true;
-
-    return (
-      matchNameOrEmail &&
-      matchVerified &&
-      matchDay &&
-      matchMonth &&
-      matchYear &&
-      matchesPackage
-    );
+    return matchNameOrEmail && matchVerified && matchesPackage;
   });
 
   return (
     <div style={{ padding: 10 }}>
-      <Typography variant="h4" gutterBottom className="text-primaryColor">
-        Tài khoản
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ fontWeight: 600, color: "#0E7490" }}
+      >
+        Quản trị viên
       </Typography>
       <div
         style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }}
@@ -252,7 +237,7 @@ function Accounts() {
           }}
         />
         <TextField
-          label="Xác thực"
+          label="Trạng thái"
           select
           value={filterVerified}
           onChange={(e) => setFilterVerified(e.target.value)}
@@ -273,29 +258,7 @@ function Accounts() {
           <MenuItem value="free">Free</MenuItem>
           <MenuItem value="premium">VIP</MenuItem>
         </TextField>
-        <TextField
-          label="Ngày"
-          type="number"
-          value={filterDay}
-          onChange={(e) => setFilterDay(e.target.value)}
-          inputProps={{ min: 1, max: 31 }}
-          style={{ width: 100 }}
-        />
-        <TextField
-          label="Tháng"
-          type="number"
-          value={filterMonth}
-          onChange={(e) => setFilterMonth(e.target.value)}
-          inputProps={{ min: 1, max: 12 }}
-          style={{ width: 100 }}
-        />
-        <TextField
-          label="Năm"
-          type="number"
-          value={filterYear}
-          onChange={(e) => setFilterYear(e.target.value)}
-          style={{ width: 120 }}
-        />
+
         <Button
           variant="contained"
           style={{ backgroundColor: "#0E7490", color: "#ffffff" }}
@@ -329,7 +292,7 @@ function Accounts() {
               <TableCell>Vai trò</TableCell>
               <TableCell>Ngày tham gia</TableCell>
               <TableCell>Gói đang sử dụng</TableCell>
-              <TableCell>Xác thực</TableCell>
+              <TableCell>Trạng thái</TableCell>
               <TableCell>Hành động</TableCell>
             </TableRow>
           </TableHead>

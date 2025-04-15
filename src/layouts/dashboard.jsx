@@ -8,40 +8,39 @@ export function Dashboard() {
   const { sidenavType } = controller;
 
   return (
-    <div className="min-h-screen flex bg-blue-gray-50/50 overflow-hidden">
-      {/* Sidebar */}
+    <div className="flex bg-blue-gray-50/50">
       <Sidenav
         routes={routes}
         brandImg={
           sidenavType === "dark" ? "/img/logo-ct.png" : "/img/logo-ct-dark.png"
         }
       />
-
-      {/* Main Content */}
       <div className="flex flex-col mt-3 px-4 flex-1 xl:ml-80 h-screen relative">
-        {/* Navbar Cố Định */}
         <DashboardNavbar className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md p-4" />
-
-        {/* Nội dung chính có scroll */}
         <div className="flex-1 overflow-auto p-4 pb-10">
           <Routes>
-            {routes.map(
-              ({ layout, pages }) =>
-                layout === "dashboard" &&
-                pages.map(({ path, element }) => (
-                  <Route exact path={path} element={element} />
-                )),
+            {routes.flatMap(({ pages }) =>
+              pages.flatMap((page) => {
+                if (page.children) {
+                  return page.children.map(({ path, element }) => (
+                    <Route key={path} path={path} element={element} />
+                  ));
+                }
+                return (
+                  <Route
+                    key={page.path}
+                    path={page.path}
+                    element={page.element}
+                  />
+                );
+              }),
             )}
           </Routes>
         </div>
-
-        {/* Footer Cố Định */}
-        <Footer className="fixed bottom-0 left-0 right-0 bg-white shadow-md p-4" />
+        <Footer className="fixed bottom-0 left-0 right-0 p-4" />
       </div>
     </div>
   );
 }
-
-Dashboard.displayName = "/src/layout/dashboard.jsx";
 
 export default Dashboard;

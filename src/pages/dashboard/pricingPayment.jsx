@@ -171,7 +171,11 @@ export const PricingPayment = () => {
 
   return (
     <div style={{ padding: 10 }}>
-      <Typography variant="h4" gutterBottom className="text-primaryColor">
+      <Typography
+        variant="h4"
+        gutterBottom
+        sx={{ fontWeight: 600, color: "#0E7490" }}
+      >
         Gói tài khoản
       </Typography>
       <div
