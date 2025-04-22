@@ -1,4 +1,5 @@
 import { axiosApi } from "@/network/api/api";
+import { Typography } from "@mui/material";
 import {
   endOfWeek,
   isWithinInterval,
@@ -6,14 +7,7 @@ import {
   subMonths,
   subWeeks,
 } from "date-fns";
-import {
-  BadgeCheck,
-  Building,
-  CheckCircle,
-  CreditCard,
-  User,
-  UserRoundCheck,
-} from "lucide-react";
+import { BadgeCheck, CheckCircle, CreditCard, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   Bar,
@@ -173,17 +167,17 @@ export default function AdminDashboard() {
   const freeUsers = filteredData.length - premiumUsers;
   const StatCard = ({ title, value, icon, bgColor }) => (
     <div
-      className={`flex justify-between items-center p-6 ${bgColor} 
-        backdrop-blur-md rounded-2xl shadow-lg hover:shadow-xl 
+      className={`flex justify-between items-center p-3 ${bgColor} 
+        backdrop-blur-md rounded-sm shadow-lg hover:shadow-xl 
         transition-transform hover:-translate-y-1 duration-300 h-full border border-gray-200`}
     >
       <div className="flex flex-col justify-center">
-        <h3 className="text-5xl font-extrabold text-primaryColor break-words max-w-full">
+        <h3 className="text-4xl font-extrabold text-white break-words max-w-full">
           {value}
         </h3>
-        <p className="text-sm font-medium text-blue-gray-600 mt-4">{title}</p>
+        <p className="text-sm font-medium text-blue-gray-800 mt-4">{title}</p>
       </div>
-      <div className="flex items-center justify-center w-20 h-20 rounded-full bg-white text-blue-gray-600 ml-2 shrink-0">
+      <div className="flex items-center justify-center w-14 h-14 rounded-full bg-white text-blue-gray-800 ml-2 shrink-0">
         {icon}
       </div>
     </div>
@@ -191,59 +185,59 @@ export default function AdminDashboard() {
 
   return (
     <div className="">
-      <div className="bg-gradient-to-r from-primaryColor to-primaryDark text-white p-8 rounded-t-2xl mb-12 shadow-xl text-center">
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-2">
-          Thống kê chung
-        </h1>
-        <p className="text-sm md:text-base opacity-90">
-          Theo dõi hiệu suất hệ thống và hoạt động người dùng trong thời gian
-          thực
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8 max-w-[1280px] mx-auto">
-        <StatCard
+      <div className="bg-white p-4">
+        {" "}
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{ fontWeight: 600, color: "#0E7490" }}
+        >
+          Tổng quan{" "}
+        </Typography>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mx-auto">
+          {/* <StatCard
           title="Số lượng Tài khoản"
           value={users.length}
           icon={<UserRoundCheck className="w-12 h-12" />}
           bgColor="bg-gradient-to-tr from-indigo-100 to-indigo-200"
-        />
-        <StatCard
-          title="Tài khoản Free"
-          value={freeUsers}
-          icon={<User className="w-12 h-12" />}
-          bgColor="bg-gradient-to-tr from-green-100 to-green-200"
-        />
-        <StatCard
-          title="Tài khoản VIP"
-          value={premiumUsers}
-          icon={<BadgeCheck className="w-12 h-12" />}
-          bgColor="bg-gradient-to-tr from-yellow-100 to-yellow-200"
-        />
-        <StatCard
-          title="Tài khoản doanh nghiệp"
-          value="0"
-          icon={<Building className="w-12 h-12" />}
-          bgColor="bg-gradient-to-tr from-orange-100 to-orange-200"
-        />
-        <StatCard
-          title="Doanh thu giao dịch"
-          value={formattedRevenue}
-          icon={<CreditCard className="w-12 h-12" />}
-          bgColor="bg-gradient-to-tr from-pink-100 to-pink-200"
-        />
-        <StatCard
-          title="Giao dịch hoàn thành"
-          value={
-            getFilteredPayments().filter((tx) => tx.status === "completed")
-              .length
-          }
-          icon={<CheckCircle className="w-12 h-12" />}
-          bgColor="bg-gradient-to-tr from-red-100 to-red-200"
-        />
+        /> */}
+          <StatCard
+            title="Tài khoản Free"
+            value={freeUsers}
+            icon={<User className="w-10 h-10" />}
+            bgColor="bg-green-200"
+          />
+          <StatCard
+            title="Tài khoản VIP"
+            value={premiumUsers}
+            icon={<BadgeCheck className="w-10 h-10" />}
+            bgColor="bg-blue-200"
+          />
+          {/* <StatCard
+            title="Tài khoản doanh nghiệp"
+            value="0"
+            icon={<Building className="w-10 h-10" />}
+            bgColor="bg-orange-200"
+          /> */}
+          <StatCard
+            title="Doanh thu giao dịch"
+            value={formattedRevenue}
+            icon={<CreditCard className="w-10 h-10" />}
+            bgColor="bg-pink-200"
+          />
+          <StatCard
+            title="Giao dịch hoàn thành"
+            value={
+              getFilteredPayments().filter((tx) => tx.status === "completed")
+                .length
+            }
+            icon={<CheckCircle className="w-10 h-10" />}
+            bgColor="bg-orange-200"
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[1280px] mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10 mx-auto">
         <DashboardCard title="📊 Số tài khoản tạo trong 5 tuần gần đây">
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={usersByWeek}>
@@ -254,7 +248,7 @@ export default function AdminDashboard() {
                 dataKey="value"
                 fill="#7C3AED"
                 radius={[8, 8, 0, 0]}
-                barSize={40}
+                barSize={30}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -335,7 +329,7 @@ export default function AdminDashboard() {
                 dataKey="value"
                 fill="#34D399"
                 radius={[8, 8, 0, 0]}
-                barSize={40}
+                barSize={50}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -371,7 +365,7 @@ export default function AdminDashboard() {
 }
 function DashboardCard({ title, children }) {
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+    <div className="bg-white p-6 rounded-sm shadow-md border border-gray-100">
       <h3 className="text-xl font-semibold text-gray-800 mb-5">{title}</h3>
       {children}
     </div>

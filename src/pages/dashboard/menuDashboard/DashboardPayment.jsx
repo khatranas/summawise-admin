@@ -1,8 +1,8 @@
 import { axiosApi } from "@/network/api/api";
+import { formatDateTime, toInputDate } from "@/utils/format";
 import {
   Box,
   Button,
-  Grid,
   Paper,
   Table,
   TableBody,
@@ -32,7 +32,6 @@ export const DashboardPayment = () => {
   const fetchData = async () => {
     try {
       const res = await axiosApi.paymentGet();
-      console.log("res", res);
       if (Array.isArray(res)) {
         setTransactions(res);
         setFiltered(res);
@@ -73,119 +72,159 @@ export const DashboardPayment = () => {
         Thống kê giao dịch
       </Typography>
 
-      <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={12} md={3}>
-          <TextField
-            label="Từ ngày"
-            type="date"
-            fullWidth
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            sx={{ borderRadius: 2 }}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            label="Đến ngày"
-            type="date"
-            fullWidth
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            sx={{ borderRadius: 2 }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={3}>
+      <Box
+        display="flex"
+        flexDirection={{ xs: "column", md: "row" }}
+        gap={2}
+        mb={2}
+        alignItems="flex-end"
+      >
+        <TextField
+          label="Từ ngày"
+          type="date"
+          value={fromDate ? toInputDate(fromDate) : ""}
+          onChange={(e) => setFromDate(e.target.value)}
+          InputLabelProps={{ shrink: true }}
+          size="small"
+          sx={{
+            borderRadius: 2,
+            width: { xs: "100%", md: 220 },
+          }}
+        />
+        <TextField
+          label="Đến ngày"
+          type="date"
+          value={toDate ? toInputDate(toDate) : ""}
+          onChange={(e) => setToDate(e.target.value)}
+          InputLabelProps={{ shrink: true }}
+          size="small"
+          sx={{
+            borderRadius: 2,
+            width: { xs: "100%", md: 220 },
+          }}
+        />
+        <Box display="flex" gap={2}>
           <Button
             variant="contained"
             onClick={handleFilter}
-            sx={{ mr: 2, backgroundColor: "#0E7490" }}
+            size="small"
+            sx={{
+              backgroundColor: "#0E7490",
+              textTransform: "none",
+              borderRadius: 1,
+              height: 40,
+              px: 3,
+            }}
           >
             Lọc
           </Button>
-          <Button variant="outlined" color="error" onClick={handleClear}>
+          <Button
+            variant="outlined"
+            color="error"
+            size="small"
+            sx={{
+              textTransform: "none",
+              borderRadius: 1,
+              height: 40,
+              px: 3,
+            }}
+            onClick={handleClear}
+          >
             Xoá lọc
           </Button>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       <Typography variant="body2" sx={{ mb: 1 }}>
         Tìm thấy <strong>{filtered.length}</strong> giao dịch.
       </Typography>
 
-      <TableContainer component={Paper} sx={{ boxShadow: 3 }}>
-        <Table sx={{ minWidth: 650 }}>
-          <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold", color: "#0E7490" }}>
-                STT
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", color: "#0E7490" }}>
-                Mã giao dịch
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", color: "#0E7490" }}>
-                Người dùng
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", color: "#0E7490" }}>
-                Trạng thái
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", color: "#0E7490" }}>
-                Số tiền
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", color: "#0E7490" }}>
-                Ngày tạo
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", color: "#0E7490" }}>
-                Hoàn thành
-              </TableCell>
+      <TableContainer
+        component={Paper}
+        sx={{
+          boxShadow: 3,
+          borderRadius: 2,
+          overflow: "hidden",
+        }}
+      >
+        <Table sx={{ minWidth: 650 }} size="small">
+          <TableHead>
+            <TableRow sx={{ backgroundColor: "#E0F2FE" }}>
+              {[
+                "STT",
+                "Mã giao dịch",
+                "Người dùng",
+                "Trạng thái",
+                "Số tiền",
+                "Ngày tạo",
+                "Hoàn thành",
+              ].map((header, index) => (
+                <TableCell
+                  key={index}
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#0E7490",
+                    textAlign: "center",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {header}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
+
           <TableBody>
-            {filtered
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((tx, i) => (
-                <TableRow
-                  key={tx._id}
-                  sx={{ "&:hover": { backgroundColor: "#f0f0f0" } }}
-                >
-                  <TableCell>{page * rowsPerPage + i + 1}</TableCell>
-                  <TableCell>{tx.orderId}</TableCell>
-                  <TableCell>
-                    {tx.userInfo?.email || tx.userInfo?.name || tx.userId}
-                  </TableCell>
-                  <TableCell
+            {filtered.length > 0 ? (
+              filtered
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((tx, i) => (
+                  <TableRow
+                    key={tx._id}
                     sx={{
-                      color: tx.status === "completed" ? "green" : "orange",
-                      fontWeight: "bold",
+                      "&:nth-of-type(odd)": {
+                        backgroundColor: "#F9FAFB",
+                      },
+                      "&:hover": {
+                        backgroundColor: "#E2E8F0",
+                      },
                     }}
                   >
-                    {tx.status === "completed" ? "Hoàn thành" : "Chờ xử lý"}
-                  </TableCell>
-                  <TableCell>{tx.amount.toLocaleString()}₫</TableCell>
-                  <TableCell>
-                    {new Date(tx.createdAt).toLocaleString("vi-VN", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      second: "2-digit",
-                    })}
-                  </TableCell>
-
-                  <TableCell>
-                    {tx.completedAt ? (
-                      new Date(tx.completedAt).toLocaleString()
-                    ) : (
-                      <span style={{ color: "red", fontWeight: "bold" }}>
-                        Chưa
-                      </span>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            {filtered.length === 0 && (
+                    <TableCell align="center">
+                      {page * rowsPerPage + i + 1}
+                    </TableCell>
+                    <TableCell align="center">{tx.orderId}</TableCell>
+                    <TableCell align="center">
+                      {tx.userInfo?.email || tx.userInfo?.name || tx.userId}
+                    </TableCell>
+                    <TableCell
+                      align="center"
+                      sx={{
+                        color:
+                          tx.status === "completed" ? "#16A34A" : "#F97316",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {tx.status === "completed" ? "Hoàn thành" : "Chờ xử lý"}
+                    </TableCell>
+                    <TableCell align="center">
+                      {tx.amount.toLocaleString()}₫
+                    </TableCell>
+                    <TableCell align="center">
+                      {formatDateTime(tx.createdAt)}
+                    </TableCell>
+                    <TableCell align="center">
+                      {tx.completedAt ? (
+                        formatDateTime(tx.completedAt)
+                      ) : (
+                        <Typography color="error" fontWeight="bold">
+                          Chưa
+                        </Typography>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+            ) : (
               <TableRow>
                 <TableCell colSpan={7} align="center">
                   Không có giao dịch nào.

@@ -55,7 +55,7 @@ function Accounts() {
 
   const [filterPackage, setFilterPackage] = useState("");
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -220,80 +220,97 @@ function Accounts() {
       >
         Quản trị viên
       </Typography>
-      <div
-        style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }}
+      {/* Filters and Actions */}
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 2,
+          mb: 3,
+          mt: 2,
+          alignItems: "flex-end",
+        }}
       >
         <TextField
           variant="outlined"
-          label="Tìm kiếm tên tài khoản/ email"
+          placeholder="Tìm kiếm tên tài khoản/ email"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          size="small"
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon />
+                <SearchIcon style={{ color: "#0E7490" }} />
               </InputAdornment>
             ),
           }}
-        />
-        <TextField
-          label="Trạng thái"
-          select
-          value={filterVerified}
-          onChange={(e) => setFilterVerified(e.target.value)}
-          style={{ minWidth: 140 }}
-        >
-          <MenuItem value="">Tất cả</MenuItem>
-          <MenuItem value="true">Đã xác thực</MenuItem>
-          <MenuItem value="false">Chưa xác thực</MenuItem>
-        </TextField>
-        <TextField
-          label="Gói sử dụng"
-          select
-          value={filterPackage}
-          onChange={(e) => setFilterPackage(e.target.value)}
-          style={{ minWidth: 140 }}
-        >
-          <MenuItem value="">Tất cả</MenuItem>
-          <MenuItem value="free">Free</MenuItem>
-          <MenuItem value="premium">VIP</MenuItem>
-        </TextField>
-
-        <Button
-          variant="contained"
-          style={{ backgroundColor: "#0E7490", color: "#ffffff" }}
-          onClick={() => {
-            setSearchTerm("");
-            setFilterVerified("");
-            setFilterDay("");
-            setFilterMonth("");
-            setFilterYear("");
-            setFilterPackage("");
+          sx={{
+            backgroundColor: "#f5f5f5",
+            borderRadius: "8px",
+            width: "300px",
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "8px",
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#0E7490",
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#0E7490",
+            },
           }}
-        >
-          Xoá bộ lọc
-        </Button>
+        />
+
+        {/* Add Account Button */}
         <Button
           variant="contained"
-          style={{ backgroundColor: "#0E7490", color: "#ffffff" }}
+          style={{
+            backgroundColor: "#0E7490",
+            color: "#ffffff",
+            minWidth: 150,
+            padding: "8px 16px",
+            height: "100%",
+            borderRadius: "8px",
+          }}
           onClick={() => setOpenCreateModal(true)}
         >
           Thêm tài khoản
         </Button>
-      </div>
-      <TableContainer component={Paper} elevation={3}>
-        <Table>
+      </Box>
+      <TableContainer
+        component={Paper}
+        elevation={3}
+        sx={{ borderRadius: "8px" }}
+      >
+        <Table sx={{ minWidth: 650 }} size="small">
           <TableHead>
-            <TableRow style={{ backgroundColor: "#f5f5f5" }}>
-              <TableCell>STT</TableCell>
-              <TableCell>Ảnh đại diện</TableCell>
-              <TableCell>Tên tài khoản</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Vai trò</TableCell>
-              <TableCell>Ngày tham gia</TableCell>
-              <TableCell>Gói đang sử dụng</TableCell>
-              <TableCell>Trạng thái</TableCell>
-              <TableCell>Hành động</TableCell>
+            <TableRow sx={{ backgroundColor: "#0E7490", color: "#fff" }}>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                STT
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Ảnh đại diện
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Tên tài khoản
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Email
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Vai trò
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Ngày tham gia
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Gói đang sử dụng
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Trạng thái
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Hành động
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -301,8 +318,14 @@ function Accounts() {
               filteredData
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((account, index) => (
-                  <TableRow key={account._id} hover>
-                    <TableCell>{index + 1}</TableCell>
+                  <TableRow
+                    key={account._id}
+                    hover
+                    sx={{ borderBottom: "1px solid #e0e0e0" }}
+                  >
+                    <TableCell sx={{ fontWeight: "bold" }}>
+                      {index + 1}
+                    </TableCell>
                     <TableCell>
                       <CustomAvatar name={account?.name} />
                     </TableCell>
@@ -331,14 +354,12 @@ function Accounts() {
                       />
                     </TableCell>
                     <TableCell>
-                      <IconButton onClick={() => handleEditAccount(account)}>
+                      <IconButton
+                        onClick={() => handleEditAccount(account)}
+                        sx={{ mr: 2 }}
+                      >
                         <EditIcon style={{ color: "#0E7490" }} />
                       </IconButton>
-                      {/* <IconButton
-                      onClick={() => handleDeleteAccount(account._id)}
-                    >
-                      <DeleteIcon color="error" />
-                    </IconButton> */}
                       <IconButton
                         onClick={() => handleOpenConfirm(account._id)}
                       >
@@ -349,7 +370,11 @@ function Accounts() {
                 ))
             ) : (
               <TableRow>
-                <TableCell colSpan={9} align="center">
+                <TableCell
+                  colSpan={9}
+                  align="center"
+                  sx={{ padding: "16px", fontStyle: "italic" }}
+                >
                   Không có dữ liệu người dùng
                 </TableCell>
               </TableRow>

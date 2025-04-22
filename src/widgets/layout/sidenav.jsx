@@ -85,7 +85,7 @@ export function Sidenav({ routes }) {
                     >
                       <div className="flex items-center gap-4">
                         {page.icon}
-                        <Typography className="capitalize font-medium">
+                        <Typography className="capitalize font-medium text-blue-gray-700">
                           {page.name}
                         </Typography>
                       </div>
@@ -149,7 +149,9 @@ export function Sidenav({ routes }) {
                         }`}
                       >
                         {page.icon}
-                        {page.name}
+                        <Typography className="capitalize font-medium">
+                          {page.name}
+                        </Typography>
                       </Button>
                     )}
                   </NavLink>

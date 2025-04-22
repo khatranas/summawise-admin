@@ -51,7 +51,7 @@ export const PricingPayment = () => {
   const [updatePricing] = useUpdatePricingMutation();
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [openConfirm, setOpenConfirm] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
@@ -178,90 +178,128 @@ export const PricingPayment = () => {
       >
         Gói tài khoản
       </Typography>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: 20,
-          marginTop: 10,
+      <TextField
+        variant="outlined"
+        placeholder="Tìm kiếm..."
+        value={searchTerm}
+        size="small"
+        onChange={handleSearchChange}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon style={{ color: "#0E7490" }} />
+            </InputAdornment>
+          ),
+        }}
+        sx={{
+          backgroundColor: "#f5f5f5",
+          borderRadius: "8px",
+          width: "300px",
+          "& .MuiOutlinedInput-root": {
+            borderRadius: "8px",
+          },
+          "& .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#0E7490",
+          },
+          "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#0E7490",
+          },
+        }}
+      />
+
+      <TableContainer
+        component={Paper}
+        elevation={3}
+        className="mt-5"
+        sx={{
+          borderRadius: 2,
+          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+          overflow: "hidden",
+          backgroundColor: "#ffffff",
         }}
       >
-        <TextField
-          variant="outlined"
-          placeholder="Tìm kiếm..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <Button
-          variant="contained"
-          style={{ backgroundColor: "#0E7490", color: "#ffffff" }} // Custom primary color
-          onClick={() => setOpenCreateModal(true)}
-        >
-          Thêm gói
-        </Button>
-      </div>
-      <TableContainer component={Paper} elevation={3}>
-        <Table>
+        <Table sx={{ minWidth: 650 }} size="small">
           <TableHead>
-            <TableRow style={{ backgroundColor: "#f5f5f5" }}>
-              <TableCell className="flex-1">STT</TableCell>
-              <TableCell className="flex-1">Mã gói</TableCell>
-              <TableCell className="flex-1">Tên gói</TableCell>
-              <TableCell className="flex-1">Giá</TableCell>
-              <TableCell className="flex-1">Mô tả</TableCell>
-              <TableCell className="flex-1">Ngày tạo</TableCell>
-              <TableCell className="flex-1">Ngày cập nhật</TableCell>
-              <TableCell className="flex-1">Hành động</TableCell>
+            <TableRow sx={{ backgroundColor: "#0E7490", color: "#fff" }}>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                STT
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Mã gói
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Tên gói
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Giá
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Mô tả
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Ngày tạo
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Ngày cập nhật
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", color: "#fff" }}>
+                Hành động
+              </TableCell>
             </TableRow>
           </TableHead>
-          <TableBody className="flex flex-col w-full">
+          <TableBody>
             {filteredData && filteredData.length > 0 ? (
               filteredData
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((pricing, index) => (
-                  <TableRow key={pricing._id} hover>
-                    <TableCell className="flex-1">
-                      {page * rowsPerPage + index + 1}
-                    </TableCell>
-                    <TableCell className="flex-1">{pricing._id}</TableCell>
-                    <TableCell className="flex-1">{pricing.name}</TableCell>
-                    <TableCell className="flex-1">
-                      {pricing.price.toLocaleString()} VND
-                    </TableCell>
-                    <TableCell className="flex-1">
-                      {pricing.description}
-                    </TableCell>
-                    <TableCell className="flex-1">
+                  <TableRow
+                    key={pricing._id}
+                    hover
+                    sx={{
+                      "&:nth-of-type(odd)": {
+                        backgroundColor: "#f9f9f9",
+                      },
+                      "&:hover": {
+                        backgroundColor: "#e6f7ff", // Màu khi di chuột
+                      },
+                    }}
+                  >
+                    <TableCell>{page * rowsPerPage + index + 1}</TableCell>
+                    <TableCell>{pricing._id}</TableCell>
+                    <TableCell>{pricing.name}</TableCell>
+                    <TableCell>{pricing.price.toLocaleString()} VND</TableCell>
+                    <TableCell>{pricing.description}</TableCell>
+                    <TableCell>
                       {new Date(pricing.createdAt).toLocaleString()}
                     </TableCell>
-                    <TableCell className="flex-1">
+                    <TableCell>
                       {new Date(pricing.updatedAt).toLocaleString()}
                     </TableCell>
                     <TableCell>
                       <IconButton
                         onClick={() => handleEditPricingPayment(pricing)}
+                        sx={{
+                          color: "#0E7490",
+                          "&:hover": { backgroundColor: "#e0f7fa" },
+                        }}
                       >
-                        <EditIcon style={{ color: "#0E7490" }} />{" "}
-                        {/* Custom primary color */}
+                        <EditIcon />
                       </IconButton>
                       <IconButton
                         onClick={() => handleOpenConfirm(pricing._id)}
+                        sx={{
+                          color: "red",
+                          "&:hover": { backgroundColor: "#ffe6e6" },
+                        }}
                       >
-                        <DeleteIcon color="error" />
+                        <DeleteIcon />
                       </IconButton>
                     </TableCell>
                   </TableRow>
                 ))
             ) : (
-              <TableRow className="flex w-full">
-                <TableCell colSpan={8} className="text-center w-full">
+              <TableRow>
+                <TableCell colSpan={8} align="center">
                   Không có gói nào.
                 </TableCell>
               </TableRow>

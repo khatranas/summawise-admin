@@ -1,9 +1,9 @@
 import { useGetUserQuery, useUpdateUserMutation } from "@/network/api/authen";
 import {
   Box,
-  Button,
   CircularProgress,
-  MenuItem,
+  InputAdornment,
+  Paper,
   Switch,
   Table,
   TableBody,
@@ -16,6 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 import Avatar from "antd/es/avatar/Avatar";
+import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 
@@ -116,62 +117,72 @@ function AccountUsers() {
       >
         Người dùng
       </Typography>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 2,
+          mb: 3,
+          mt: 2,
+          alignItems: "flex-end",
+        }}
+      >
         <TextField
-          label="Tìm kiếm"
-          placeholder="Tên hoặc email"
+          variant="outlined"
+          placeholder="Tìm kiếm tên người dùng/ email"
           value={searchTerm}
-          onChange={handleSearchChange}
-          fullWidth
-        />
-
-        <TextField
-          select
-          label="Trạng thái xác thực"
-          value={verifiedStatus}
-          onChange={(e) => setVerifiedStatus(e.target.value)}
-          fullWidth
-        >
-          <MenuItem value="">Tất cả</MenuItem>
-          <MenuItem value="true">Đã xác thực</MenuItem>
-          <MenuItem value="false">Chưa xác thực</MenuItem>
-        </TextField>
-        <TextField
-          select
-          label="Gói dịch vụ"
-          value={packageType}
-          onChange={(e) => setPackageType(e.target.value)}
-          fullWidth
-        >
-          <MenuItem value="">Tất cả</MenuItem>
-          <MenuItem value="free">Miễn phí</MenuItem>
-          <MenuItem value="premium">Premium</MenuItem>
-        </TextField>
-        <Button
-          variant="contained"
-          style={{ backgroundColor: "#0E7490", color: "#ffffff" }}
-          onClick={() => {
-            setSearchTerm("");
-            setVerifiedStatus("");
-            setPackageType("");
+          onChange={(e) => setSearchTerm(e.target.value)}
+          size="small"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon style={{ color: "#0E7490" }} />
+              </InputAdornment>
+            ),
           }}
-        >
-          Xoá bộ lọc
-        </Button>
-      </div>
+          sx={{
+            backgroundColor: "#f5f5f5",
+            borderRadius: "8px",
+            width: "300px",
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "8px",
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#0E7490",
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#0E7490",
+            },
+          }}
+        />
+      </Box>
 
-      <TableContainer component={Box} elevation={3}>
-        <Table>
+      <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 2 }}>
+        <Table sx={{ minWidth: 650 }} size="small">
           <TableHead>
-            <TableRow style={{ backgroundColor: "#f5f5f5" }}>
-              <TableCell>STT</TableCell>
-              <TableCell>Ảnh đại diện</TableCell>
-              <TableCell>Tên người dùng</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Vai trò</TableCell>
-              <TableCell>Ngày tham gia</TableCell>
-              <TableCell>Gói đang sử dụng</TableCell>
-              <TableCell>Xác thực</TableCell>
+            <TableRow sx={{ backgroundColor: "#0E7490", color: "#fff" }}>
+              <TableCell sx={{ fontWeight: 600, color: "#fff" }}>STT</TableCell>
+              <TableCell sx={{ fontWeight: 600, color: "#fff" }}>
+                Ảnh đại diện
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600, color: "#fff" }}>
+                Tên người dùng
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600, color: "#fff" }}>
+                Email
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600, color: "#fff" }}>
+                Vai trò
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600, color: "#fff" }}>
+                Ngày tham gia
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600, color: "#fff" }}>
+                Gói dịch vụ
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600, color: "#fff" }}>
+                Trạng thái
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -179,10 +190,19 @@ function AccountUsers() {
               filteredData
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((account, index) => (
-                  <TableRow key={account._id} hover>
-                    <TableCell>{index + 1}</TableCell>
+                  <TableRow
+                    key={account._id}
+                    hover
+                    sx={{
+                      transition: "0.2s",
+                      "&:hover": { backgroundColor: "#f9f9f9" },
+                    }}
+                  >
+                    <TableCell>{page * rowsPerPage + index + 1}</TableCell>
                     <TableCell>
-                      <CustomAvatar name={account?.name} />
+                      <Box display="flex" justifyContent="center">
+                        <CustomAvatar name={account?.name} />
+                      </Box>
                     </TableCell>
                     <TableCell>{account.name}</TableCell>
                     <TableCell>{account.email}</TableCell>
@@ -212,7 +232,7 @@ function AccountUsers() {
                 ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} align="center">
+                <TableCell colSpan={8} align="center" sx={{ py: 5 }}>
                   Không có dữ liệu người dùng
                 </TableCell>
               </TableRow>
@@ -220,6 +240,7 @@ function AccountUsers() {
           </TableBody>
         </Table>
       </TableContainer>
+
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
